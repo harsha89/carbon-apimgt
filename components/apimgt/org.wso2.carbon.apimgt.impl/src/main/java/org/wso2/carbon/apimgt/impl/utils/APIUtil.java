@@ -5179,4 +5179,8 @@ public final class APIUtil {
 		return json;
 	}
 
+	public static String getLifeCycleTransitionAction(String currentStatus, String nextStatu) {
+		//TODO Implement
+		return "Publish";
+	}
 }
