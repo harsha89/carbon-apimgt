@@ -24,7 +24,7 @@ i18n.init(request,localeResourcesBasePath);
     jagg.render({
         "name":"page/base",
         "inputs":{
-            "title":"API Publisher - Tiers",
+            "title":"API Publisher - Edit Policy",
              "header":{
                 "name":"menu/primary"
             },
@@ -33,7 +33,7 @@ i18n.init(request,localeResourcesBasePath);
                     "name":"layout/extended",
                     "inputs":{
                         "middle":{
-                            "name":"tiers"
+                            "name":"policy-edit"
                         }
                     }
                 }

@@ -78,6 +78,8 @@
     "blockAll":"Production & Sandbox",
     "subsPendingApproval":"Subscription is pending approval",
     "tierPermissions":"Tier Permissions",
+    "throttlePolicies":"Throttle Policies",
+    "addThrottlePolicy":"Add Throttle Policy",
     "tiers":"Tier",
     "permissions":"Permissions",
     "allow":"Allow",

@@ -2268,7 +2268,10 @@ public class ApiMgtDAO {
         Set<APIKey> apiKeys = new HashSet<APIKey>();
 
         try {
+            long startGetProdKey = System.currentTimeMillis();
             APIKey productionKey = getProductionKeyOfApplication(applicationId, accessTokenStoreTable);
+            long endGetProdKey = System.currentTimeMillis();
+            log.info("GET PROD KEYS OF APPLICATION = " + (endGetProdKey - startGetProdKey));
             if (productionKey != null) {
                 apiKeys.add(productionKey);
             } else {
@@ -2278,8 +2281,10 @@ public class ApiMgtDAO {
                     apiKeys.add(productionKey);
                 }
             }
-
+            long startGetSandKey = System.currentTimeMillis();
             APIKey sandboxKey = getSandboxKeyOfApplication(applicationId, accessTokenStoreTable);
+            long endGetSandKey = System.currentTimeMillis();
+            log.info("GET SAND KEYS OF APPLICATION = " + (endGetSandKey - startGetSandKey));
             if (sandboxKey != null) {
                 apiKeys.add(sandboxKey);
             } else {
@@ -4379,7 +4384,7 @@ public class ApiMgtDAO {
     }
 
     public Application[] getApplications(Subscriber subscriber, String groupingId) throws APIManagementException {
-
+        long start = System.currentTimeMillis();
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
@@ -4430,8 +4435,16 @@ public class ApiMgtDAO {
                 application.setGroupId(rs.getString("GROUP_ID"));
                 application.setUUID(rs.getString("UUID"));
 
+                long startGetappKeys = System.currentTimeMillis();
                 Set<APIKey> keys = getApplicationKeys(subscriber.getName(), application.getId());
+                long endGetappKeys = System.currentTimeMillis();
+                log.info("GET APPLICATION KEYS TIME =" + (endGetappKeys - startGetappKeys));
+
+                long startGetAuthApp = System.currentTimeMillis();
                 Map<String, OAuthApplicationInfo> keyMap = getOAuthApplications(application.getId());
+                long endGetAuthApp = System.currentTimeMillis();
+
+                log.info("GET OAUTH APPLICATION TIME =" + (endGetAuthApp - startGetAuthApp));
 
                 for (Map.Entry<String, OAuthApplicationInfo> entry : keyMap.entrySet()) {
                     application.addOAuthApp(entry.getKey(), entry.getValue());
@@ -4454,6 +4467,8 @@ public class ApiMgtDAO {
         } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
         }
+        long end = System.currentTimeMillis();
+        log.info("TIME  TAKEN FOR GET APPLICATION =" + (end - start)/1000);
         return applications;
     }
 

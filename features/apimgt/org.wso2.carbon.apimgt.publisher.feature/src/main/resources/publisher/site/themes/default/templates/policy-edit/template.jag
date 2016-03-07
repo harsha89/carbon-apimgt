@@ -1,4 +1,4 @@
-<% jagg.template("tiers", function(inputs, outputs, jagg) { %>
+<% jagg.template("policy-edit", function(inputs, outputs, jagg) { %>
 	<%
 		var tiers = outputs.tiers; 
 		var tierPermissions = outputs.tierPermissions;
