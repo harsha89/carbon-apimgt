@@ -80,6 +80,8 @@
     "tierPermissions":"Tier Permissions",
     "throttlePolicies":"Throttle Policies",
     "addThrottlePolicy":"Add Throttle Policy",
+    "pipeline":"Pipeline",
+    "pipelines":"Pipelines",
     "tiers":"Tier",
     "permissions":"Permissions",
     "allow":"Allow",

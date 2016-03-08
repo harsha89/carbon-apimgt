@@ -1,100 +1,334 @@
 <% jagg.template("policy-add", function(inputs, outputs, jagg) { %>
-	<%
-		var tiers = outputs.tiers; 
-		var tierPermissions = outputs.tierPermissions;
-	%>
-	<div id="tiers">
-		<div class="title-section">
-                <h2><%=i18n.localize("tierPermissions")%></h2>
+<div id="throttle-policies">
+	<div id="general-details" style="margin-left: 600px">
+	    <div class="title-section">
+                <h2><%=i18n.localize("addThrottlePolicy")%></h2>
         </div>
-        <div class="content-section shadow-up">
-        	<div class="content-data">
-        		<table class="table table-bordered">
-        			<thead>
-        				<tr>
-        					<th class="tierSpecialCell"><%=i18n.localize("tiers")%></th>
-        					<th class="appSpecialCell"><%=i18n.localize("permissions")%></th>
-        				</tr>
-        			</thead>
-        			<tbody id="tiers">
-        			<%
-        			
-        			
-        				for (i = 0; i < tierPermissions.length; i++) {
-        					var permissionsDefined = false, denied = false, roleList = "", roleArray, defaultRole, i;
-        				
-        					if (tierPermissions[i].permissionType == 'deny') {
-        							denied = true;
-        					}
-        					roleArray = tierPermissions[i].roles;
-        					if (roleArray.length > 0) {
-        						roleList = roleArray[0];
-        					}
-        					for (var a = 1; a < roleArray.length; a ++) {
-        						roleList = roleList + "," + roleArray[a];
-        					}
-        					
-        				
-        				
-        				var radioInputName = "permissionType" + i; 
-        				var roleInputName = "roles" + i;
-        				var tierInputName = "tier" + i;
-        				var statusUpdateMsgName = "statusUpdateMsg" +i;
-                        var tierPermissionBtn = "tierPermission" + i;
-        			%>
-                         <tr>
-	        					<td><%=tierPermissions[i].tierDisplayName%></td>
-	        					<td>
-	        					<div>
-		        					<div id="radiodev" class="form-inline">
-		        					<% if (denied) {%>
-		        						<label class="checkbox-inline radio">
-			        						<input type="radio"  name="<%=radioInputName%>" value="allow" id="y"/>
-			       							<%=i18n.localize("allow")%>
-			       						</label>
-			       						<label class="checkbox-inline radio">
-			       							<input type="radio" name="<%=radioInputName%>" value="deny" id="z" checked/>
-			        						<%=i18n.localize("deny")%>
-			        					</label>
-		        					 <%} else {
-		        					 	
-		        					 %>
-		        					 	<label class="checkbox-inline radio">
-		        					 		<input type="radio"  name="<%=radioInputName%>" value="allow" id="y" checked/>
-			       							<%=i18n.localize("allow")%>
-			       						</label>
-			       						<label class="checkbox-inline radio">
-			       							<input type="radio" name="<%=radioInputName%>" value="deny" id="z"/>
-			        						<%=i18n.localize("deny")%>
-			        					</label>
-		        					 <%}%>
-		        					 </div>
-		        					 <div class="form-inline">
-		        					 	<label class="control-label" for="roles" id="rolesLabel" name="rolesLabel">roles</label>
-		        					 	<input type="text" class="input rolesInput"  id="<%=roleInputName%>" name="<%=roleInputName%>" value="<%=roleList%>"/>
-		        					 	<label class="errorTier" id="errorTier<%=String(i)%>"style="display:none;">This field is required.</label>
-                                        <label class="errorTier" id="errorTierRoles<%=String(i)%>"style="display:none;">Invalid role name[s]</label>
-		        					 	<label class="help-block" id="rolesHelp"><%=i18n.localize("rolesHelpMsg")%></label>
-		        					 </div>
-	        					</div> 
-		                	
-		                		
-	                        	
-		            			
-		            			
-		            			<div class="form-actions" id="saveButtons">
-                    				<button type="submit" id="addNewAPIButton-<%=String(i)%>" name="addNewAPIButton" onclick="updatePermissions('<%=tierPermissions[i].tierName%>', <%=i%>, '<%=tierPermissionBtn%>' )" class="btn btn-primary has-spinner <%=tierPermissionBtn%>"><%=i18n.localize("updatePermissions")%></button>
-                				</div>
-                				
-                				<div class="alert alert-success" id="<%=statusUpdateMsgName%>" style="display:none;">
-        							<%=i18n.localize("tierPermissionSuccessMsg")%>
-     							</div>
-        					</td>
-        					</tr>
-                      <%}
-        			%>
-        			</tbody>
-        		</table>
-        	</div>
-	</div>
+        <fieldset>
+    <legend>General Details</legend>
+
+    <div class="control-group">
+        <label class="control-label" for="policy-name">Policy Name:<span class="requiredAstrix">*</span></label>
+        <div class="controls">
+            <input type="text" class="input-xlarge required validRegistryName validateForwardSlashAtEnd validInput apiNameExists noSpace" id="policy-name" name="policy-nam" autofocus="autofocus" value="">
+            <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
+            <p id="name_help" class="hide">Name of the throttle policy.</p>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="policy-description">Policy Description:<span class="requiredAstrix">*</span></label>
+        <div class="controls">
+            <input type="text" class="input-xlarge required validRegistryName validateForwardSlashAtEnd validInput apiNameExists noSpace" id="policy-description" name="policy-description" autofocus="autofocus" value="">
+            <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
+            <p id="name_help" class="hide">Description of the throttle policy.</p>
+        </div>
+    </div>
+
+	<div class="control-group">
+        <label class="control-label" for="level">Level:</label>
+        <div class="controls">
+            <select class="select required valid" id="level" name="level">
+                    <option value="api-level">API Level</option>
+                    <option value="user-level">User Level</option>
+            </select>
+                <a class="icon-question-sign help_popup" data-trigger="hover" help_data="level_help" data-original-title="" title=""></a>
+                <p id="level_help" class="hide"><strong>APi Lavel :</strong> Will be applicable per whole API.<br><strong> User Level :</strong>  Applicable in user level.<br><strong></p>
+        </div>
+    </div>
+    </fieldset>
+    </div>
+<div class="row no-gutter" style="margin-left: 600px">
+<h3><%=i18n.localize("pipelines")%></h3> <a href="#" class="btn btn-default"><span class="fw fw-plus"></span> Add Pipeline</a>
+<div id="pipeline-1">
+    <h3><%=i18n.localize("pipeline")%></h3>
+    <div class="wr-hidden-operations-nav col-lg-4">
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('ip-condition', this)" class="selected">
+            <span class="wr-hidden-operations-icon fw-stack">
+                <i class="fw fw-key fw-stack-2x"></i>
+            </span>
+            IP Condition
+            <span id="ip-condition-policy-configured" class="has-configured status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="ip-condition-policy-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="ip-condition-policy-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
+        </a>
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('header-condition', this)">
+            <span class="wr-hidden-operations-icon fw-stack">
+                <i class="fw fw-header fw-stack-2x"></i>
+            </span>
+            Header Condition
+            <span id="header-configured" class="has-configured status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="header-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="header-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
+        </a>
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('date-condition', this)">
+            <span class="wr-hidden-operations-icon fw-stack">
+                <i class="fw fw-key fw-stack-2x"></i>
+            </span>
+            Date Condition
+            <span id="date-condition-policy-configured" class="has-configured status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="date-condition-policy-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="date-condition-policy-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
+        </a>
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('query-param-condition', this)">
+            <span class="wr-hidden-operations-icon fw-stack">
+                <i class="fw fw-key fw-stack-2x"></i>
+            </span>
+            Query Param Condition
+            <span id="query-param-condition-policy-configured" class="has-configured status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="query-param-condition-policy-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="query-param-condition-policy-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
+        </a>
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('http-verb-condition', this)">
+            <span class="wr-hidden-operations-icon fw-stack">
+                <i class="fw fw-key fw-stack-2x"></i>
+            </span>
+            HTTP Verb Condition
+            <span id="http-verb-condition-policy-configured" class="has-configured status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="http-verb-condition-policy-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="http-verb-condition-policy-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
+        </a>
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('payload-condition', this)">
+            <span class="wr-hidden-operations-icon fw-stack">
+                <i class="fw fw-key fw-stack-2x"></i>
+            </span>
+            Payload Condition
+            <span id="payload-condition-policy-configured" class="has-configured status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="payload-condition-policy-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="payload-condition-policy-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
+        </a>
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('jwt-claim-condition', this)">
+            <span class="wr-hidden-operations-icon fw-stack">
+                <i class="fw fw-key fw-stack-2x"></i>
+            </span>
+            JWT Claim Condition
+            <span id="jwt-claim-condition-policy-configured" class="has-configured status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="jwt-claim-condition-policy-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
+            <span id="jwt-claim-condition-policy-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
+        </a>
+    </div>
+
+    <div class="wr-hidden-operations-content col-lg-8">
+        <!-- IP Condition policy -->
+        <div class="wr-hidden-operation" data-operation="ip-condition-policy" style="display: block">
+            <div class="panel panel-default operation-data" data-operation="ip-condition-policy" data-operation-code="IP_CONDITION_POLICY">
+                <div id="ip-condition-policy-heading" class="panel-heading" role="tab">
+                    <h2 class="sub-title panel-title">
+                        IP Condition Policy
+                        <label id="passcode-policy-lbl" class="wr-input-control switch" data-toggle="collapse" data-target="#ip-condition-policy-body">
+                            <input type="checkbox" />
+                            <span class="helper"></span>
+                            <span class="text"></span>
+                        </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            This configuration use to define ip condition
+                        </div>
+                    </h2>
+                </div>
+                <div id="ip-condition-policy-body" class="panel-collapse panel-body collapse" role="tabpanel" aria-labelledby="ip-condition-policy-body">
+
+                    <div id="ip-condition-policy-feature-error-msg" class="alert alert-danger hidden" role="alert">
+                        <i class="icon fw fw-error"></i><span></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End of IP Condition policy -->
+
+        <!-- Header Condition policy -->
+        <div class="wr-hidden-operation" data-operation="ip-condition-policy" style="display: none">
+            <div class="panel panel-default operation-data" data-operation="header-condition-policy" data-operation-code="HEADER_CONDITION_POLICY">
+                <div id="header-condition-policy-heading" class="panel-heading" role="tab">
+                    <h2 class="sub-title panel-title">
+                        Header Condition Policy
+                        <label id="header-condition-policy-lbl" class="wr-input-control switch" data-toggle="collapse" data-target="#header-condition-policy-body">
+                            <input type="checkbox" />
+                            <span class="helper"></span>
+                            <span class="text"></span>
+                        </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            This configuration use to define header conditions
+                        </div>
+                    </h2>
+                </div>
+                <div id="ip-condition-policy-body" class="panel-collapse panel-body collapse" role="tabpanel" aria-labelledby="header-condition-policy-body">
+
+                    <div id="header-condition-policy-feature-error-msg" class="alert alert-danger hidden" role="alert">
+                        <i class="icon fw fw-error"></i><span></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End of Header Condition policy -->
+        <!-- Datte Condition policy -->
+        <div class="wr-hidden-operation" data-operation="ip-condition-policy" style="display: none">
+            <div class="panel panel-default operation-data" data-operation="date-condition-policy" data-operation-code="DATE_CONDITION_POLICY">
+                <div id="date-condition-policy-heading" class="panel-heading" role="tab">
+                    <h2 class="sub-title panel-title">
+                        Date Condition Policy
+                        <label id="date-policy-lbl" class="wr-input-control switch" data-toggle="collapse" data-target="#date-condition-policy-body">
+                            <input type="checkbox" />
+                            <span class="helper"></span>
+                            <span class="text"></span>
+                        </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            This configuration use to define header conditions
+                        </div>
+                    </h2>
+                </div>
+                <div id="date-condition-policy-body" class="panel-collapse panel-body collapse" role="tabpanel" aria-labelledby="date-condition-policy-body">
+
+                    <div id="date-condition-policy-feature-error-msg" class="alert alert-danger hidden" role="alert">
+                        <i class="icon fw fw-error"></i><span></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End of Date Condition policy -->
+        <!-- Date Condition policy -->
+        <div class="wr-hidden-operation" data-operation="ip-condition-policy" style="display: none">
+            <div class="panel panel-default operation-data" data-operation="date-condition-policy" data-operation-code="DATE_CONDITION_POLICY">
+                <div id="date-condition-policy-heading" class="panel-heading" role="tab">
+                    <h2 class="sub-title panel-title">
+                        Date Condition Policy
+                        <label id="date-condition-policy-lbl" class="wr-input-control switch" data-toggle="collapse" data-target="#date-condition-policy-body">
+                            <input type="checkbox" />
+                            <span class="helper"></span>
+                            <span class="text"></span>
+                        </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            This configuration use to define header conditions
+                        </div>
+                    </h2>
+                </div>
+                <div id="date-condition-policy-body" class="panel-collapse panel-body collapse" role="tabpanel" aria-labelledby="date-condition-policy-body">
+
+                    <div id="date-condition-policy-feature-error-msg" class="alert alert-danger hidden" role="alert">
+                        <i class="icon fw fw-error"></i><span></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End of Date Condition policy -->
+        <!-- Query Param policy -->
+        <div class="wr-hidden-operation" data-operation="query-param-condition-policy" style="display: none">
+            <div class="panel panel-default operation-data" data-operation="date-condition-policy" data-operation-code="QUERY_PARAM_CONDITION_POLICY">
+                <div id="query-param-condition-policy-heading" class="panel-heading" role="tab">
+                    <h2 class="sub-title panel-title">
+                        Query Param Condition Policy
+                        <label id="query-param-condition-policy-lbl" class="wr-input-control switch" data-toggle="collapse" data-target="#query-param-condition-policy-body">
+                            <input type="checkbox" />
+                            <span class="helper"></span>
+                            <span class="text"></span>
+                        </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            This configuration use to define query param conditions
+                        </div>
+                    </h2>
+                </div>
+                <div id="query-param-condition-policy-body" class="panel-collapse panel-body collapse" role="tabpanel" aria-labelledby="query-param-condition-policy-body">
+
+                    <div id="query-param-condition-policy-feature-error-msg" class="alert alert-danger hidden" role="alert">
+                        <i class="icon fw fw-error"></i><span></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End of Query Param Condition policy -->
+        <!-- Http Verb condition policy -->
+        <div class="wr-hidden-operation" data-operation="http-verb-condition-policy" style="display: none">
+            <div class="panel panel-default operation-data" data-operation="http-verb-condition-policy" data-operation-code="HTTP_VERB_CONDITION_POLICY">
+                <div id="http-verb-condition-policy-heading" class="panel-heading" role="tab">
+                    <h2 class="sub-title panel-title">
+                        Http Verb Condition Policy
+                        <label id="http-verb-condition-policy-lbl" class="wr-input-control switch" data-toggle="collapse" data-target="#http-verb-condition-policy-body">
+                            <input type="checkbox" />
+                            <span class="helper"></span>
+                            <span class="text"></span>
+                        </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            This configuration use to define http verb conditions
+                        </div>
+                    </h2>
+                </div>
+                <div id="http-verb-condition-policy-body" class="panel-collapse panel-body collapse" role="tabpanel" aria-labelledby="http-verb-condition-policy-body">
+
+                    <div id="http-verb-condition-policy-feature-error-msg" class="alert alert-danger hidden" role="alert">
+                        <i class="icon fw fw-error"></i><span></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End of Query Param Condition policy -->
+        <!-- Payload condition policy -->
+        <div class="wr-hidden-operation" data-operation="payload-condition-policy" style="display: none">
+            <div class="panel panel-default operation-data" data-operation="http-verb-condition-policy" data-operation-code="PAYLOAD_CONDITION_POLICY">
+                <div id="payload-condition-policy-heading" class="panel-heading" role="tab">
+                    <h2 class="sub-title panel-title">
+                        Http Verb Condition Policy
+                        <label id="payload-condition-policy-lbl" class="wr-input-control switch" data-toggle="collapse" data-target="#payload-condition-policy-body">
+                            <input type="checkbox" />
+                            <span class="helper"></span>
+                            <span class="text"></span>
+                        </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            This configuration use to define payload  conditions
+                        </div>
+                    </h2>
+                </div>
+                <div id="payload-condition-policy-body" class="panel-collapse panel-body collapse" role="tabpanel" aria-labelledby="payload-condition-policy-body">
+
+                    <div id="payload-condition-policy-feature-error-msg" class="alert alert-danger hidden" role="alert">
+                        <i class="icon fw fw-error"></i><span></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End of Payload Condition policy -->
+        <!-- JWT Claims condition policy -->
+        <div class="wr-hidden-operation" data-operation="payload-condition-policy" style="display: none">
+            <div class="panel panel-default operation-data" data-operation="jwt-claims-condition-policy" data-operation-code="JWT_CLAIMS_CONDITION_POLICY">
+                <div id="jwt-claims-condition-policy-heading" class="panel-heading" role="tab">
+                    <h2 class="sub-title panel-title">
+                        Http Verb Condition Policy
+                        <label id="jwt-claims-condition-policy-lbl" class="wr-input-control switch" data-toggle="collapse" data-target="#jwt-claims-condition-policy-body">
+                            <input type="checkbox" />
+                            <span class="helper"></span>
+                            <span class="text"></span>
+                        </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            This configuration use to define jwt claims conditions
+                        </div>
+                    </h2>
+                </div>
+                <div id="jwt-claims-condition-policy-body" class="panel-collapse panel-body collapse" role="tabpanel" aria-labelledby="payload-condition-policy-body">
+
+                    <div id="jwt-claims-condition-policy-feature-error-msg" class="alert alert-danger hidden" role="alert">
+                        <i class="icon fw fw-error"></i><span></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End of Payload Condition policy -->
+        </div>
+        <!-- End of Restrictions -->
+    </div>
+    </div>
+</div>
 <%});%>
