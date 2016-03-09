@@ -1,13 +1,12 @@
 <% jagg.template("policy-add", function(inputs, outputs, jagg) { %>
 <div id="throttle-policies">
-	<div id="general-details" style="margin-left: 600px">
+	<div id="general-details">
 	    <div class="title-section">
                 <h2><%=i18n.localize("addThrottlePolicy")%></h2>
         </div>
         <fieldset>
     <legend>General Details</legend>
-
-    <div class="control-group">
+     <div class="control-group">
         <label class="control-label" for="policy-name">Policy Name:<span class="requiredAstrix">*</span></label>
         <div class="controls">
             <input type="text" class="input-xlarge required validRegistryName validateForwardSlashAtEnd validInput apiNameExists noSpace" id="policy-name" name="policy-nam" autofocus="autofocus" value="">
@@ -29,21 +28,75 @@
         <label class="control-label" for="level">Level:</label>
         <div class="controls">
             <select class="select required valid" id="level" name="level">
-                    <option value="api-level">API Level</option>
+                    <option value="api-level" selected>API Level</option>
                     <option value="user-level">User Level</option>
             </select>
                 <a class="icon-question-sign help_popup" data-trigger="hover" help_data="level_help" data-original-title="" title=""></a>
-                <p id="level_help" class="hide"><strong>APi Lavel :</strong> Will be applicable per whole API.<br><strong> User Level :</strong>  Applicable in user level.<br><strong></p>
+                <p id="level-help" class="hide"><strong>APi Lavel :</strong> Will be applicable per whole API.<br><strong> User Level :</strong>  Applicable in user level.<br><strong></p>
+        </div>
+    </div>
+
+    </fieldset>
+
+    <fieldset>
+    <legend>Default Policy</legend>
+
+        <label class="control-label" for="level">Type:</label>
+        <div class="controls">
+            <select class="select required valid" id="default-policy-level" name="default-policy-level">
+                    <option value="request-count" selected>Request Count</option>
+                    <option value="bandwidth">Bandwidth</option>
+            </select>
+                <a class="icon-question-sign help_popup" data-trigger="hover" help_data="level_help" data-original-title="" title=""></a>
+                <p id="default-policy-level-help" class="hide"><strong>Request Count :</strong> Throttle based on request count .<br><strong> Bandwidth :</strong>  Throttle Based on bandwidth.<br><strong></p>
+        </div>
+
+    <div class="control-group">
+        <label class="control-label" for="request-count">Request Count:<span class="requiredAstrix">*</span></label>
+        <div class="controls">
+            <input type="text" class="input-xlarge required validRegistryName validateForwardSlashAtEnd validInput noSpace" id="request-count" name="request-count" autofocus="autofocus" value="">
+            <select class="select required valid" id="request-count-unit" name="request-count-unit">
+                    <option value="seconds" selected>Seconds</option>
+                    <option value="minutes">Minutes</option>
+                    <option value="hours">Hours</option>
+                    <option value="days">Days</option>
+            </select>
+
+            <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
+            <p id="name_help" class="hide">Number of requests allowed.</p>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="request-count">Bandwidth:<span class="requiredAstrix">*</span></label>
+        <div class="controls">
+            <input type="text" class="input-xlarge required validRegistryName validateForwardSlashAtEnd validInput noSpace" id="bandwidth" name="bandwidth" autofocus="autofocus" value="">
+            <select class="select required valid" id="bandwidth-unit" name="bandwidth-unit">
+                    <option value="minutes" selected>kbps</option>
+                    <option value="hours">Mbps</option>
+            </select>
+
+            <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
+            <p id="name_help" class="hide">Number of requests allowed.</p>
         </div>
     </div>
     </fieldset>
+
     </div>
-<div class="row no-gutter" style="margin-left: 600px">
-<h3><%=i18n.localize("pipelines")%></h3> <a href="#" class="btn btn-default"><span class="fw fw-plus"></span> Add Pipeline</a>
-<div id="pipeline-1">
-    <h3><%=i18n.localize("pipeline")%></h3>
+    <div id="throttle-policies-pipeline-content">
+        <h3><%=i18n.localize("executionFlows")%></h3> <a href="#" class="btn btn-default" onclick="addPolicy()"><span class="fw fw-plus"></span><%=i18n.localize("addExecutionFlow")%></a>
+        <div id="pipeline-content">
+
+        </div>
+    </div>
+
+</div>
+
+<script id="designer-policy-template" type="text/x-handlebars-template">
+<a href="#pipeline-{{executionFlow.id}}" data-toggle="collapse"><%=i18n.localize("executionFlow")%></a>
+<div id="pipeline-{{executionFlow.id}}" class="collapse">
     <div class="wr-hidden-operations-nav col-lg-4">
-        <a href="javascript:void(0)" onclick="showAdvanceOperation('ip-condition', this)" class="selected">
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('ip-condition-{{executionFlow.id}}', this)" class="selected">
             <span class="wr-hidden-operations-icon fw-stack">
                 <i class="fw fw-key fw-stack-2x"></i>
             </span>
@@ -52,7 +105,7 @@
             <span id="ip-condition-policy-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
             <span id="ip-condition-policy-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
         </a>
-        <a href="javascript:void(0)" onclick="showAdvanceOperation('header-condition', this)">
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('header-condition-{{executionFlow.id}}', this)">
             <span class="wr-hidden-operations-icon fw-stack">
                 <i class="fw fw-header fw-stack-2x"></i>
             </span>
@@ -61,7 +114,7 @@
             <span id="header-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
             <span id="header-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
         </a>
-        <a href="javascript:void(0)" onclick="showAdvanceOperation('date-condition', this)">
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('date-condition-{{executionFlow.id}}', this)">
             <span class="wr-hidden-operations-icon fw-stack">
                 <i class="fw fw-key fw-stack-2x"></i>
             </span>
@@ -70,7 +123,7 @@
             <span id="date-condition-policy-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
             <span id="date-condition-policy-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
         </a>
-        <a href="javascript:void(0)" onclick="showAdvanceOperation('query-param-condition', this)">
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('query-param-condition-{{executionFlow.id}}', this)">
             <span class="wr-hidden-operations-icon fw-stack">
                 <i class="fw fw-key fw-stack-2x"></i>
             </span>
@@ -79,7 +132,7 @@
             <span id="query-param-condition-policy-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
             <span id="query-param-condition-policy-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
         </a>
-        <a href="javascript:void(0)" onclick="showAdvanceOperation('http-verb-condition', this)">
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('http-verb-condition-{{executionFlow.id}}', this)">
             <span class="wr-hidden-operations-icon fw-stack">
                 <i class="fw fw-key fw-stack-2x"></i>
             </span>
@@ -88,7 +141,7 @@
             <span id="http-verb-condition-policy-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
             <span id="http-verb-condition-policy-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
         </a>
-        <a href="javascript:void(0)" onclick="showAdvanceOperation('payload-condition', this)">
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('payload-condition-{{executionFlow.id}}', this)">
             <span class="wr-hidden-operations-icon fw-stack">
                 <i class="fw fw-key fw-stack-2x"></i>
             </span>
@@ -97,7 +150,7 @@
             <span id="payload-condition-policy-ok" class="has-success status-icon hidden"><i class="fw fw-ok"></i></span>
             <span id="payload-condition-policy-error" class="has-error status-icon hidden"><i class="fw fw-error"></i></span>
         </a>
-        <a href="javascript:void(0)" onclick="showAdvanceOperation('jwt-claim-condition', this)">
+        <a href="javascript:void(0)" onclick="showAdvanceOperation('jwt-claim-condition-{{executionFlow.id}}', this)">
             <span class="wr-hidden-operations-icon fw-stack">
                 <i class="fw fw-key fw-stack-2x"></i>
             </span>
@@ -110,7 +163,7 @@
 
     <div class="wr-hidden-operations-content col-lg-8">
         <!-- IP Condition policy -->
-        <div class="wr-hidden-operation" data-operation="ip-condition-policy" style="display: block">
+        <div class="wr-hidden-operation" data-operation="ip-condition--{{executionFlow.id}}" style="display: block">
             <div class="panel panel-default operation-data" data-operation="ip-condition-policy" data-operation-code="IP_CONDITION_POLICY">
                 <div id="ip-condition-policy-heading" class="panel-heading" role="tab">
                     <h2 class="sub-title panel-title">
@@ -308,7 +361,7 @@
                         <label id="jwt-claims-condition-policy-lbl" class="wr-input-control switch" data-toggle="collapse" data-target="#jwt-claims-condition-policy-body">
                             <input type="checkbox" />
                             <span class="helper"></span>
-                            <span class="text"></span>
+                            <span class="text"></span>`
                         </label>
                         <hr>
                         <div class="panel-title-description">
@@ -329,6 +382,5 @@
         </div>
         <!-- End of Restrictions -->
     </div>
-    </div>
-</div>
+</script>
 <%});%>

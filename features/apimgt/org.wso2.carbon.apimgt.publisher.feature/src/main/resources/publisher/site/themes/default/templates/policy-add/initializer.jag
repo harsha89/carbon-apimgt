@@ -4,7 +4,6 @@ jagg.initializer("policy-add", {
      preInitialize:function () {
          jagg.addHeaderCSS("policy-designer.css", "jagg", "templates/policy-add/css/policy-designer.css");
          jagg.addHeaderCSS("bootstrap-editable.css", "jagg", "templates/policy-add/css/bootstrap-editable.css");
-         jagg.addHeaderCSS("custom-desktop.css", "jagg", "templates/policy-add/css/custom-desktop.css");
          jagg.addHeaderCSS("docs.min.css", "jagg", "templates/policy-add/css/docs.min.css");
          jagg.addHeaderJS("custom-validate", "jagg", "templates/utils/custom-validation/custom-validation.js");
          jagg.addFooterJS("handlebars", "jagg", "templates/item-design/js/handlebars-v1.3.0.js");
@@ -27,6 +26,7 @@ jagg.initializer("policy-add", {
          jagg.addFooterJS("url-validation", "jagg", "templates/utils/url-validation/url-validation.js");
          jagg.addFooterJS("policy-add", "jagg", "templates/policy-add/js/policy-design.js");
          jagg.addFooterJS("policy-add", "jagg", "templates/policy-add/js/policy-create.js");
+         jagg.addFooterJS("policy-add", "jagg", "templates/policy-add/js/policy-designer-new.js");
     }
 });
 %>
