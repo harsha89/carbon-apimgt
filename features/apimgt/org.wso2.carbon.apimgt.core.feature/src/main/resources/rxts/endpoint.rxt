@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<artifactType type="application/vnd.wso2-endpoint+xml" shortName="endpoint" singularLabel="Endpoint" pluralLabel="Endpoints" hasNamespace="false" iconSet="3">
+    <storagePath>/apimgt/applicationdata/endpoints/@{overview_name}</storagePath>
+    <nameAttribute>overview_name</nameAttribute>
+    <ui>
+        <list>
+            <column name="Name">
+                <data type="path" value="overview_name" href="@{storagePath}"/>
+            </column>
+        </list>
+    </ui>
+    <content>
+        <table name="Overview">
+            <field type="text" required="true">
+                <name>Name</name>
+            </field>
+            <field type="text">
+                <name>Description</name>
+            </field>
+           <field type="text">
+                <name>Endpoint Secured</name>
+           </field>
+           <field type="text">
+               <name>Endpoint Auth Digest</name>
+           </field>
+            <field type="text-area">
+               <name>Endpoint Config</name>
+           </field>
+            <field type="text" url="true">
+               <name>Endpoint Username</name>
+           </field>
+            <field type="text" url="true">
+               <name>Endpoint Password</name>
+           </field>
+            <field type="options">
+                <name label="Type">Endpoint Type</name>
+                <values>
+                    <value>HTTP/REST Endpoint</value>
+                    <value>HTTP/SOAP Endpoint</value>
+                </values>
+            </field>
+        </table>
+    </content>
+</artifactType>
+

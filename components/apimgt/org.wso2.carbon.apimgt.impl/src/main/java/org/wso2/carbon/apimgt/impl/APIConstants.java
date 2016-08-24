@@ -510,6 +510,7 @@ public final class APIConstants {
     public static final String API_PUBLISHER_ENABLE_API_DOC_VISIBILITY_LEVELS = API_PUBLISHER
             + "EnableAPIDocVisibilityLevels";
     public static final String API_PUBLISHER_APIS_PER_PAGE = API_PUBLISHER + "APIsPerPage";
+    public static final String API_PUBLISHER_ENDPIOINTS_PER_PAGE = API_PUBLISHER + "EndpointsPerPage";
     public static final String WSO2_API_STORE_TYPE = "wso2";
 
     public static final String EXTERNAL_API_STORES = "ExternalAPIStores";
@@ -1153,6 +1154,10 @@ public final class APIConstants {
     public static final String TAG_SEARCH_TYPE_PREFIX = "tags";
     public static final String TAG_SEARCH_TYPE_PREFIX2 = "tags=";
     public static final String NAME_TYPE_PREFIX = "name";
+
+    //Constants regarding endpoint seperation
+    public static final String ENDPOINT_OVERVIEW_NAME = "overview_name";
+    public static final String ENDPOINT_KEY = "endpoint";
 
     public static class AdvancedThrottleConstants {
         public static final String THROTTLING_CONFIGURATIONS = "ThrottlingConfigurations";

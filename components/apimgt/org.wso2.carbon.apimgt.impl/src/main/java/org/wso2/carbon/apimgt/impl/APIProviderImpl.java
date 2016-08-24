@@ -64,6 +64,7 @@ import org.wso2.carbon.apimgt.impl.utils.APINameComparator;
 import org.wso2.carbon.apimgt.impl.utils.APIStoreNameComparator;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionComparator;
+import org.wso2.carbon.apimgt.impl.utils.EndpointNameComparator;
 import org.wso2.carbon.apimgt.impl.utils.StatUpdateClusterMessage;
 import org.wso2.carbon.apimgt.statsupdate.stub.GatewayStatsUpdateServiceAPIManagementExceptionException;
 import org.wso2.carbon.apimgt.statsupdate.stub.GatewayStatsUpdateServiceClusteringFaultException;
@@ -4567,6 +4568,106 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
         }
 
+    }
+
+    @Override
+    public Map<String, Object> getAllPaginatedEndpoints(String tenantDomain, int start, int end) throws APIManagementException {
+        Map<String, Object> result = new HashMap<String, Object>();
+        List<Endpoint> endpointSortedList = new ArrayList<Endpoint>();
+        int totalLength = 0;
+        boolean isTenantFlowStarted = false;
+
+        try {
+            String paginationLimitFromConfig = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                    .getAPIManagerConfiguration()
+                    .getFirstProperty(APIConstants.API_PUBLISHER_ENDPIOINTS_PER_PAGE);
+
+            // If the Config exists use it to set the pagination limit
+            final int maximumPaginationLimit;
+            if (paginationLimitFromConfig != null) {
+                // The additional 1 added to the maxPaginationLimit is to help us to determine if more Endpointss may
+                // exist so that we know that we are unable to determine the actual total Endpoiny count. We will
+                // subtract this 1 later on so that it does not interfere with the logic of the rest of the application
+                int paginationLimit = Integer.parseInt(paginationLimitFromConfig);
+                // Because the store jaggery pagination logic is 10 results per a page we need to set pagination
+                // limit to at least 11 or the pagination done at this level will conflict with the store pagination
+                // leading to some of the APIs not being displayed
+                if (paginationLimit < 11) {
+                    paginationLimit = 11;
+                    log.warn("Value of '" + APIConstants.API_PUBLISHER_ENDPIOINTS_PER_PAGE + "' is too low, defaulting to 11");
+                }
+                maximumPaginationLimit = start + paginationLimit + 1;
+            }
+            // Else if the config is not specifed we go with default functionality and load all endpoints
+            else {
+                maximumPaginationLimit = Integer.MAX_VALUE;
+            }
+            Registry registry;
+            boolean inTenantMode = (tenantDomain != null);
+            if ((inTenantMode && this.tenantDomain == null) || (inTenantMode && isTenantDomainNotMatching(tenantDomain))) {
+                if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                    isTenantFlowStarted = true;
+                }
+                int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                                                                                            .getTenantId(tenantDomain);
+                APIUtil.loadTenantRegistry(tenantId);
+                registry = ServiceReferenceHolder.getInstance().getRegistryService().
+                        getGovernanceUserRegistry(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME, tenantId);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME);
+            } else {
+                registry = this.registry;
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            }
+
+            PaginationContext.init(start, end, "ASC", APIConstants.ENDPOINT_OVERVIEW_NAME, maximumPaginationLimit);
+            GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
+            Map<String, List<String>> listMap = new HashMap<String, List<String>>();
+
+            if (artifactManager != null) {
+                GenericArtifact[] genericArtifacts = artifactManager.findGenericArtifacts(listMap);
+                totalLength = PaginationContext.getInstance().getLength();
+                if (genericArtifacts == null || genericArtifacts.length == 0) {
+                    result.put("endpoints", endpointSortedList);
+                    result.put("totalLength", totalLength);
+                    return result;
+                }
+                // Check to see if we can speculate that there are more APIs to be loaded
+                if (maximumPaginationLimit == totalLength) {
+                    // performance hit
+                    --totalLength; // Remove the additional 1 we added earlier when setting max pagination limit
+                }
+                int tempLength = 0;
+                for (GenericArtifact artifact : genericArtifacts) {
+
+                    Endpoint endpoint = APIUtil.getEndpoint(artifact);
+
+                    if (endpoint != null) {
+                        endpointSortedList.add(endpoint);
+                    }
+                    tempLength++;
+                    if (tempLength >= totalLength) {
+                        break;
+                    }
+                }
+                Collections.sort(endpointSortedList, new EndpointNameComparator());
+            }
+
+        } catch (RegistryException e) {
+            handleException("Failed to get all Endpoints", e);
+        } catch (UserStoreException e) {
+            handleException("Failed to get all Endpoints", e);
+        } finally {
+            PaginationContext.destroy();
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+
+        result.put("endpoints", endpointSortedList);
+        result.put("totalLength", totalLength);
+        return result;
     }
 
 

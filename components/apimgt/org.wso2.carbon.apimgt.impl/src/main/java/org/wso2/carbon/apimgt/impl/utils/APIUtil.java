@@ -6217,4 +6217,8 @@ public final class APIUtil {
         return ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIAnalyticsConfiguration().
                 getDasReceiverServerPassword();
     }
+
+    public static org.wso2.carbon.apimgt.api.model.Endpoint getEndpoint(GovernanceArtifact artifact) {
+        return null;
+    }
 }

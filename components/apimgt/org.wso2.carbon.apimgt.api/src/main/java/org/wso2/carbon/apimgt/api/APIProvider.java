@@ -819,4 +819,30 @@ public interface APIProvider extends APIManager {
      */
     String getLifecycleConfiguration(String tenantDomain) throws APIManagementException;
 
+    /**
+     * Get the paginated APIs from publisher
+     *
+     * @param tenantDomain tenant domain
+     * @param start        starting number
+     * @param end          ending number
+     * @return set of API
+     * @throws APIManagementException if failed to get Apis
+     */
+    Map<String, Object> getAllPaginatedEndpoints(String tenantDomain, int start, int end) throws APIManagementException;
+
+    /**
+     * Adds a new endpoint
+     *
+     * @param endpoint Endpoint
+     * @throws APIManagementException if failed to add endpoint
+     */
+    void addEndpoint(Endpoint endpoint) throws APIManagementException;
+
+    /**
+     * Update a new endpoint
+     *
+     * @param endpoint Endpoint
+     * @throws APIManagementException if failed to update endpoint
+     */
+    void updateEndpoint(Endpoint endpoint) throws APIManagementException;
 }
