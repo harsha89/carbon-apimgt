@@ -38,21 +38,44 @@ import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIProvider;
 import org.wso2.carbon.apimgt.api.FaultGatewaysException;
-import org.wso2.carbon.apimgt.api.UnsupportedPolicyTypeException;
 import org.wso2.carbon.apimgt.api.PolicyDeploymentFailureException;
+import org.wso2.carbon.apimgt.api.UnsupportedPolicyTypeException;
 import org.wso2.carbon.apimgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.apimgt.api.model.*;
-import org.wso2.carbon.apimgt.api.model.policy.*;
-import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
-import org.wso2.carbon.apimgt.impl.notification.NotificationDTO;
-import org.wso2.carbon.apimgt.impl.notification.NotificationExecutor;
-import org.wso2.carbon.apimgt.impl.notification.NotifierConstants;
+import org.wso2.carbon.apimgt.api.model.API;
+import org.wso2.carbon.apimgt.api.model.APIIdentifier;
+import org.wso2.carbon.apimgt.api.model.APIStatus;
+import org.wso2.carbon.apimgt.api.model.APIStore;
+import org.wso2.carbon.apimgt.api.model.BlockConditionsDTO;
+import org.wso2.carbon.apimgt.api.model.CORSConfiguration;
+import org.wso2.carbon.apimgt.api.model.Documentation;
+import org.wso2.carbon.apimgt.api.model.DuplicateAPIException;
+import org.wso2.carbon.apimgt.api.model.Endpoint;
+import org.wso2.carbon.apimgt.api.model.LifeCycleEvent;
+import org.wso2.carbon.apimgt.api.model.Provider;
+import org.wso2.carbon.apimgt.api.model.ResourceFile;
+import org.wso2.carbon.apimgt.api.model.SubscribedAPI;
+import org.wso2.carbon.apimgt.api.model.Subscriber;
+import org.wso2.carbon.apimgt.api.model.Tier;
+import org.wso2.carbon.apimgt.api.model.URITemplate;
+import org.wso2.carbon.apimgt.api.model.Usage;
+import org.wso2.carbon.apimgt.api.model.policy.APIPolicy;
+import org.wso2.carbon.apimgt.api.model.policy.ApplicationPolicy;
+import org.wso2.carbon.apimgt.api.model.policy.Condition;
+import org.wso2.carbon.apimgt.api.model.policy.GlobalPolicy;
+import org.wso2.carbon.apimgt.api.model.policy.Pipeline;
+import org.wso2.carbon.apimgt.api.model.policy.Policy;
+import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
+import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
 import org.wso2.carbon.apimgt.impl.clients.RegistryCacheInvalidationClient;
 import org.wso2.carbon.apimgt.impl.clients.TierCacheInvalidationClient;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.dto.Environment;
+import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
 import org.wso2.carbon.apimgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.apimgt.impl.notification.NotificationDTO;
+import org.wso2.carbon.apimgt.impl.notification.NotificationExecutor;
+import org.wso2.carbon.apimgt.impl.notification.NotifierConstants;
 import org.wso2.carbon.apimgt.impl.notification.exception.NotificationException;
 import org.wso2.carbon.apimgt.impl.publishers.WSO2APIPublisher;
 import org.wso2.carbon.apimgt.impl.template.APITemplateBuilder;
@@ -104,7 +127,6 @@ import javax.cache.Cache;
 import javax.cache.Caching;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -4670,5 +4692,70 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return result;
     }
 
+    @Override
+    public void addEndpoint(Endpoint endpoint) throws APIManagementException {
+        GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
+        try {
+            GenericArtifact genericArtifact =
+                    artifactManager.newGovernanceArtifact(new QName(endpoint.getName()));
+            GenericArtifact artifact = APIUtil.createEndpointArtifactContent(genericArtifact, endpoint);
+            artifactManager.addGenericArtifact(artifact);
+            if (log.isDebugEnabled()) {
+                String logMessage =
+                        "Endpoint Name: " + endpoint.getName() + ", Endpoint Version " + endpoint.getVersion()
+                                + " created";
+                log.debug(logMessage);
+            }
+        } catch (GovernanceException e) {
+            handleException("Error while adding endpoint governance artifact name" + endpoint.getName(), e);
+        }
+    }
+
+    @Override
+    public void updateEndpoint(Endpoint endpoint) throws APIManagementException {
+        GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
+        try {
+            String defaultEndpointPath = APIConstants.ENDPOINT_LOCATION + "/" + endpoint.getName();
+            Resource defaultEndpointSourceArtifact = registry.get(defaultEndpointPath);
+            GenericArtifact endpointArtifact = artifactManager.getGenericArtifact(defaultEndpointSourceArtifact.getUUID());
+            GenericArtifact artifact = APIUtil.createEndpointArtifactContent(endpointArtifact, endpoint);
+            artifactManager.updateGenericArtifact(artifact);
+            if (log.isDebugEnabled()) {
+                String logMessage =
+                        "Endpoint Name: " + endpoint.getName() + ", Endpoint Version " + endpoint.getVersion()
+                                + " created";
+                log.debug(logMessage);
+            }
+        } catch (GovernanceException e) {
+            handleException("Error while adding endpoint governance artifact name" + endpoint.getName(), e);
+        } catch (RegistryException e) {
+            handleException("Error while getting registry governance artifact name" + endpoint.getName(), e);
+        }
+    }
+
+    @Override
+    public void deleteEndpoint(String endpointName) throws APIManagementException {
+
+    }
+
+    @Override
+    public void deleteEndpoint(String endpointName, String endpointVersion) throws APIManagementException {
+
+    }
+
+    @Override
+    public void getEndpoints() throws APIManagementException {
+
+    }
+
+    @Override
+    public void getEndpoint(String endPointName) throws APIManagementException {
+
+    }
+
+    @Override
+    public void getEndpoint(String endPointName, String endpointVersion) throws APIManagementException {
+
+    }
 
 }

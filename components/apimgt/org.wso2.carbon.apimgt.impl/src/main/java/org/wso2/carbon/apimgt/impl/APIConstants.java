@@ -70,6 +70,8 @@ public final class APIConstants {
     //registry location of API
     public static final String API_LOCATION = API_APPLICATION_DATA_LOCATION + "/provider";
 
+    public static final String ENDPOINT_LOCATION = API_APPLICATION_DATA_LOCATION + "/endpoints";
+
     public static final String API_TIER_LOCATION = API_APPLICATION_DATA_LOCATION + "/tiers.xml";
 
     public static final String APP_TIER_LOCATION = API_APPLICATION_DATA_LOCATION + "/app-tiers.xml";
@@ -1232,4 +1234,17 @@ public final class APIConstants {
         public static final String APPLICATION_ID = "application_id";
     }
 
+    //Endpoint separation related constants
+    public static final String ENDPOINT_NAME = "overview_name";
+    public static final String ENDPOINT_OVERVIEW_VERSION = "overview_version";
+    public static final String ENDPOINT_OVERVIEW_DESCRIPTION = "overview_description";
+    public static final String ENDPOINT_OVERVIEW_ENDPOINT_SECURED = "overview_endpointSecured";
+    public static final String ENDPOINT_OVERVIEW_ENDPOINT_AUTH_DIGEST = "overview_endpointAuthDigest";
+    public static final String ENDPOINT_OVERVIEW_ENDPOINT_USERNAME = "overview_endpointUsername";
+    public static final String ENDPOINT_OVERVIEW_ENDPOINT_PASSWORD = "overview_endpointPassword";
+    public static final String ENDPOINT_OVERVIEW_ENDPOINT_CONFIG = "overview_endpointConfig";
+    public static final String ENDPOINT_OVERVIEW_VISIBILITY ="overview_visibility";
+    public static final String ENDPOINT_OVERVIEW_VISIBLE_ROLES ="overview_visibleRoles";
+    public static final String ENDPOINT_OVERVIEW_ENDPOINT_TYPE = "overview_endpointType";
+    public static final String ENDPOINT_OVERVIEW_CREATOR = "overview_creator";
 }

@@ -32,6 +32,23 @@
             <field type="text" url="true">
                <name>Endpoint Password</name>
            </field>
+           <field type="text-area">
+               <name>Endpoint Config</name>
+           </field>
+           <field type="options">
+               <name label="Type">Visibility</name>
+               <values>
+                   <value>Public</value>
+                   <value>Restricted</value>
+                   <value>Private</value>
+               </values>
+           </field>
+           <field type="text">
+               <name>Visible Roles</name>
+           </field>
+           <field type="text">
+               <name>Creator</name>
+          </field>
             <field type="options">
                 <name label="Type">Endpoint Type</name>
                 <values>

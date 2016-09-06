@@ -6221,4 +6221,32 @@ public final class APIUtil {
     public static org.wso2.carbon.apimgt.api.model.Endpoint getEndpoint(GovernanceArtifact artifact) {
         return null;
     }
+
+    /**
+     * Create Governance artifact from given attributes
+     *
+     * @param artifact initial governance artifact
+     * @param endpoint Endpoint object with the attributes value
+     * @return GenericArtifact
+     * @throws org.wso2.carbon.apimgt.api.APIManagementException if failed to create API
+     */
+    public static GenericArtifact createEndpointArtifactContent(GenericArtifact artifact, org.wso2.carbon.apimgt.api.model.Endpoint endpoint)
+            throws APIManagementException {
+        try {
+            artifact.setAttribute(APIConstants.ENDPOINT_NAME, endpoint.getName());
+            artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_DESCRIPTION, endpoint.getDescription());
+            artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_SECURED, Boolean.toString(endpoint.isEndpointSecured()));
+            artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_USERNAME, endpoint.getEndpointUsername());
+            artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_PASSWORD, new String(endpoint.getEndpointPassword()));
+            artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_CONFIG, endpoint.getEndpointConfig());
+            artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_AUTH_DIGEST, endpoint.getEndPointAuthDigest());
+            artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_VISIBLE_ROLES, endpoint.getVisibleRoles());
+            artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_TYPE, endpoint.getEndpointType());
+            artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_CREATOR, endpoint.getCreator());
+        } catch (GovernanceException e) {
+            handleException("Error while setting endpoint attributes to governance artifact for endpoint "
+                                                                                                + endpoint.getName(), e);
+        }
+        return artifact;
+    }
 }

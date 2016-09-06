@@ -845,4 +845,45 @@ public interface APIProvider extends APIManager {
      * @throws APIManagementException if failed to update endpoint
      */
     void updateEndpoint(Endpoint endpoint) throws APIManagementException;
+
+    /**
+     * Delete a endpoint
+     *
+     * @param endpointName name of the endpoint
+     * @throws APIManagementException if failed to update endpoint
+     */
+    void deleteEndpoint(String endpointName) throws APIManagementException;
+
+    /**
+     * Delete a endpoint by name and version
+     *
+     * @param endpointName name of the endpoint
+     * @throws APIManagementException if failed to update endpoint
+     */
+    void deleteEndpoint(String endpointName, String endpointVersion) throws APIManagementException;
+
+    /**
+     * Get all endpoints of logged in tenant
+     *
+     * @throws APIManagementException if failed to update endpoint
+     */
+    void getEndpoints() throws APIManagementException;
+
+    /**
+     * Get endpoint by name
+     *
+     * @param endPointName name of the endpoint
+     * @throws APIManagementException if failed to update endpoint
+     */
+    void getEndpoint(String endPointName) throws APIManagementException;
+
+    /**
+     * Get endpoint by name and version
+     *
+     * @param endPointName name of the endpoint
+     * @param endpointVersion version of the endpoint
+     *
+     * @throws APIManagementException if failed to update endpoint
+     */
+    void getEndpoint(String endPointName, String endpointVersion) throws APIManagementException;
 }

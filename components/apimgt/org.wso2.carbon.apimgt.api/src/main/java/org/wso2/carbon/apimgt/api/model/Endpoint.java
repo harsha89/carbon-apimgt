@@ -26,14 +26,16 @@ import java.util.Date;
 @SuppressWarnings("unused")
 public class Endpoint {
     private String name;
+    private String version;
     private String description;
     private boolean endpointSecured;
     private String endPointAuthDigest;
     private String endpointConfig;
     private String endpointUsername;
     private char[] endpointPassword;
-    private String[] visibleRoles;
+    private String visibleRoles;
     private String endpointType;
+    private String creator;
 
     public String getName() {
         return name;
@@ -91,11 +93,11 @@ public class Endpoint {
         this.endpointPassword = endpointPassword;
     }
 
-    public String[] getVisibleRoles() {
+    public String getVisibleRoles() {
         return visibleRoles;
     }
 
-    public void setVisibleRoles(String[] visibleRoles) {
+    public void setVisibleRoles(String visibleRoles) {
         this.visibleRoles = visibleRoles;
     }
 
@@ -105,5 +107,21 @@ public class Endpoint {
 
     public void setEndpointType(String endpointType) {
         this.endpointType = endpointType;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 }
