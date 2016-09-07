@@ -128,7 +128,9 @@ public final class APIConstants {
 
     //registry location for consumer
     public static final String API_ROOT_LOCATION = API_APPLICATION_DATA_LOCATION + "/provider";
-    
+
+    public static final String ENDPOINT_ROOT_LOCATION = API_APPLICATION_DATA_LOCATION + "/endpoints";
+
     //registry location for API documentation
     public static final String API_DOC_LOCATION = API_APPLICATION_DATA_LOCATION + "/api-docs";
     

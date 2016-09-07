@@ -6218,10 +6218,6 @@ public final class APIUtil {
                 getDasReceiverServerPassword();
     }
 
-    public static org.wso2.carbon.apimgt.api.model.Endpoint getEndpoint(GovernanceArtifact artifact) {
-        return null;
-    }
-
     /**
      * Create Governance artifact from given attributes
      *
@@ -6248,5 +6244,36 @@ public final class APIUtil {
                                                                                                 + endpoint.getName(), e);
         }
         return artifact;
+    }
+
+    /**
+     * Create Governance artifact from given attributes
+     *
+     * @param artifact governance artifact
+     * @return Endpoint
+     * @throws org.wso2.carbon.apimgt.api.APIManagementException if failed to create endpoint from governance artifact
+     */
+    public static org.wso2.carbon.apimgt.api.model.Endpoint createEndpointFromArtifactContent(GenericArtifact artifact)
+            throws APIManagementException {
+        String endpointName = "";
+        org.wso2.carbon.apimgt.api.model.Endpoint endpoint = null;
+        try {
+            endpoint = new org.wso2.carbon.apimgt.api.model.Endpoint();
+            endpointName = artifact.getAttribute(APIConstants.ENDPOINT_NAME);
+            endpoint.setName(endpointName);
+            endpoint.setDescription(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_DESCRIPTION));
+            endpoint.setEndpointSecured(Boolean.parseBoolean(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_SECURED)));
+            endpoint.setEndpointUsername(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_USERNAME));
+            endpoint.setEndpointPassword(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_PASSWORD).toCharArray());
+            endpoint.setEndpointConfig(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_CONFIG));
+            endpoint.setEndPointAuthDigest(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_AUTH_DIGEST));
+            endpoint.setVisibleRoles(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_VISIBLE_ROLES));
+            endpoint.setEndpointType(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_TYPE));
+            endpoint.setCreator(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_CREATOR));
+        } catch (GovernanceException e) {
+            handleException("Error while getting governance artifact attributes to endpoint "
+                    + endpointName, e);
+        }
+        return endpoint;
     }
 }

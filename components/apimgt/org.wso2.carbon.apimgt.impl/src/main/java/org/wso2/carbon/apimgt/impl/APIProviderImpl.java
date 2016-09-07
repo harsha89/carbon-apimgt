@@ -4620,7 +4620,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
                 maximumPaginationLimit = start + paginationLimit + 1;
             }
-            // Else if the config is not specifed we go with default functionality and load all endpoints
+            // Else if the config is not specified we go with default functionality and load all endpoints
             else {
                 maximumPaginationLimit = Integer.MAX_VALUE;
             }
@@ -4663,7 +4663,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 int tempLength = 0;
                 for (GenericArtifact artifact : genericArtifacts) {
 
-                    Endpoint endpoint = APIUtil.getEndpoint(artifact);
+                    Endpoint endpoint = APIUtil.createEndpointFromArtifactContent(artifact);
 
                     if (endpoint != null) {
                         endpointSortedList.add(endpoint);
@@ -4692,7 +4692,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return result;
     }
 
-    @Override
     public void addEndpoint(Endpoint endpoint) throws APIManagementException {
         GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
         try {
@@ -4701,61 +4700,95 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             GenericArtifact artifact = APIUtil.createEndpointArtifactContent(genericArtifact, endpoint);
             artifactManager.addGenericArtifact(artifact);
             if (log.isDebugEnabled()) {
-                String logMessage =
-                        "Endpoint Name: " + endpoint.getName() + ", Endpoint Version " + endpoint.getVersion()
-                                + " created";
+                String logMessage = "Endpoint Name: " + endpoint.getName() + ", Endpoint Version " + endpoint.getVersion()
+                                      + " created";
                 log.debug(logMessage);
             }
         } catch (GovernanceException e) {
-            handleException("Error while adding endpoint governance artifact name" + endpoint.getName(), e);
+            handleException("Error while adding endpoint governance artifact name " + endpoint.getName(), e);
         }
     }
 
-    @Override
     public void updateEndpoint(Endpoint endpoint) throws APIManagementException {
         GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
         try {
-            String defaultEndpointPath = APIConstants.ENDPOINT_LOCATION + "/" + endpoint.getName();
-            Resource defaultEndpointSourceArtifact = registry.get(defaultEndpointPath);
+            String endpointPath = APIConstants.ENDPOINT_LOCATION + RegistryConstants.PATH_SEPARATOR + endpoint.getName();
+            Resource defaultEndpointSourceArtifact = registry.get(endpointPath);
             GenericArtifact endpointArtifact = artifactManager.getGenericArtifact(defaultEndpointSourceArtifact.getUUID());
             GenericArtifact artifact = APIUtil.createEndpointArtifactContent(endpointArtifact, endpoint);
             artifactManager.updateGenericArtifact(artifact);
             if (log.isDebugEnabled()) {
-                String logMessage =
-                        "Endpoint Name: " + endpoint.getName() + ", Endpoint Version " + endpoint.getVersion()
-                                + " created";
+                String logMessage = "Endpoint Name: " + endpoint.getName() + ", Endpoint Version " + endpoint.getVersion()
+                                     + " updated";
                 log.debug(logMessage);
             }
         } catch (GovernanceException e) {
-            handleException("Error while adding endpoint governance artifact name" + endpoint.getName(), e);
+            handleException("Error while updating endpoint governance artifact name " + endpoint.getName(), e);
         } catch (RegistryException e) {
-            handleException("Error while getting registry governance artifact name" + endpoint.getName(), e);
+            handleException("Error while getting endpoint artifact from registry " + endpoint.getName(), e);
         }
     }
 
-    @Override
     public void deleteEndpoint(String endpointName) throws APIManagementException {
-
+        GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
+        try {
+            String defaultEndpointPath = APIConstants.ENDPOINT_LOCATION + RegistryConstants.PATH_SEPARATOR + endpointName;
+            Resource endpointSourceArtifact = registry.get(defaultEndpointPath);
+            artifactManager.removeGenericArtifact(endpointSourceArtifact.getUUID());
+            if (log.isDebugEnabled()) {
+                String logMessage = "Endpoint Name: " + endpointName + ", Endpoint Version deleted";
+                log.debug(logMessage);
+            }
+        } catch (GovernanceException e) {
+            handleException("Error while updating endpoint governance artifact name " + endpointName, e);
+        } catch (RegistryException e) {
+            handleException("Error while getting endpoint artifact from registry " + endpointName, e);
+        }
     }
 
-    @Override
-    public void deleteEndpoint(String endpointName, String endpointVersion) throws APIManagementException {
+    public List<Endpoint> getEndpoints() throws APIManagementException {
+        List<Endpoint> endpointSortedList = new ArrayList<Endpoint>();
+        try {
+            String endpointsPath = APIConstants.ENDPOINT_ROOT_LOCATION;
+            GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
+            Association[] endpoints = registry.getAssociations(endpointsPath, APIConstants.PROVIDER_ASSOCIATION);
+            for (Association association : endpoints) {
+                String endpointPath = association.getDestinationPath();
+                Resource resource = registry.get(endpointPath);
+                String endpointArtifactId = resource.getUUID();
+                if (endpointArtifactId != null) {
+                    GenericArtifact endpointArtifact = artifactManager.getGenericArtifact(endpointArtifactId);
+                    endpointSortedList.add(APIUtil.createEndpointFromArtifactContent(endpointArtifact));
+                } else {
+                    throw new GovernanceException("Artifact id is null of " + endpointPath);
+                }
+            }
 
+        } catch (RegistryException e) {
+            handleException("Failed to get endpoints", e);
+        }
+        Collections.sort(endpointSortedList, new EndpointNameComparator());
+        return endpointSortedList;
     }
 
-    @Override
-    public void getEndpoints() throws APIManagementException {
-
-    }
-
-    @Override
-    public void getEndpoint(String endPointName) throws APIManagementException {
-
-    }
-
-    @Override
-    public void getEndpoint(String endPointName, String endpointVersion) throws APIManagementException {
-
+    public Endpoint getEndpoint(String endPointName) throws APIManagementException {
+        GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
+        Endpoint endpoint = null;
+        try {
+            String endpointPath = APIConstants.ENDPOINT_LOCATION + RegistryConstants.PATH_SEPARATOR  + endPointName;
+            Resource endpointSourceArtifact = registry.get(endpointPath);
+            GenericArtifact endpointArtifact = artifactManager.getGenericArtifact(endpointSourceArtifact.getUUID());
+            endpoint = APIUtil.createEndpointFromArtifactContent(endpointArtifact);
+            if (log.isDebugEnabled()) {
+                String logMessage = "Endpoint Name: " + endPointName + " retrieved";
+                log.debug(logMessage);
+            }
+        } catch (GovernanceException e) {
+            handleException("Error while getting endpoint from governance artifact name " + endPointName, e);
+        } catch (RegistryException e) {
+            handleException("Error while getting endpoint artifact from registry " + endPointName, e);
+        }
+        return endpoint;
     }
 
 }

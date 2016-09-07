@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.apimgt.impl.utils;
 
-import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.Endpoint;
 
 import java.io.Serializable;
@@ -28,7 +27,7 @@ import java.util.Comparator;
  * This comparator used to order endpoints by name.
  */
 public class EndpointNameComparator implements Comparator<Endpoint>, Serializable {
-    public int compare(Endpoint enpoint1, Endpoint endpoint2) {
-         return enpoint1.getName().compareToIgnoreCase(endpoint2.getName());
+    public int compare(Endpoint endpoint, Endpoint endpoint2) {
+         return endpoint.getName().compareToIgnoreCase(endpoint2.getName());
     }
 }
