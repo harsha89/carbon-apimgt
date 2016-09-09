@@ -4593,7 +4593,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public Map<String, Object> getAllPaginatedEndpoints(String tenantDomain, int start, int end) throws APIManagementException {
+    public Map<String, Object> getAllPaginatedEndpoints(String tenantDomain, int start, int offset, final String searchValue) throws APIManagementException {
         Map<String, Object> result = new HashMap<String, Object>();
         List<Endpoint> endpointSortedList = new ArrayList<Endpoint>();
         int totalLength = 0;
@@ -4643,9 +4643,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
             }
 
-            PaginationContext.init(start, end, "ASC", APIConstants.ENDPOINT_OVERVIEW_NAME, maximumPaginationLimit);
+            PaginationContext.init(start, offset, "ASC", APIConstants.ENDPOINT_OVERVIEW_NAME, maximumPaginationLimit);
             GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
             Map<String, List<String>> listMap = new HashMap<String, List<String>>();
+
+            if(!StringUtils.isEmpty(searchValue)) {
+                listMap.put(APIConstants.ENDPOINT_OVERVIEW_NAME, new ArrayList<String>() {
+                    {
+                        add(searchValue);
+                    }
+                });
+            }
 
             if (artifactManager != null) {
                 GenericArtifact[] genericArtifacts = artifactManager.findGenericArtifacts(listMap);

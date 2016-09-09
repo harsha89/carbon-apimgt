@@ -824,11 +824,12 @@ public interface APIProvider extends APIManager {
      *
      * @param tenantDomain tenant domain
      * @param start        starting number
-     * @param end          ending number
+     * @param offset       offset number
+     * @param searchValue  searching value
      * @return set of API
      * @throws APIManagementException if failed to get Apis
      */
-    Map<String, Object> getAllPaginatedEndpoints(String tenantDomain, int start, int end) throws APIManagementException;
+    Map<String, Object> getAllPaginatedEndpoints(String tenantDomain, int start, int offset, String searchValue) throws APIManagementException;
 
     /**
      * Adds a new endpoint

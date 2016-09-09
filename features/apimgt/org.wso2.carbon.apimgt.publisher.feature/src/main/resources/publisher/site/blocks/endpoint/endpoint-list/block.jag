@@ -1,5 +1,5 @@
 <%
-jagg.block("application/application-list", {
+jagg.block("endpoint/endpoint-list", {
     initializer:function (data) {
 
     },
@@ -10,27 +10,7 @@ jagg.block("application/application-list", {
         }
     },
 
-    getOutputs:function (inputs) {
-
-        var applications, result, user = inputs.user;
-        result = jagg.module("application").getApplications(user.username);
-        applications = result.applications;
-
-        var tiers, tierResults;
-        tierResults = jagg.module("tiers").getApplicationTiers();
-        tiers = tierResults.tiers;
-
-        if (result.error) {
-            return  {
-                error:true,
-                message:result.error
-            };
-        } else {
-            return {
-                "applications":applications,
-                "tiers":tiers
-            };
-        }
+    getOutputs:function () {
 
     }
 

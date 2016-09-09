@@ -1,0 +1,8 @@
+<%
+jagg.initializer("endpoint/endpoint-list", {
+
+    preInitialize:function () {
+        jagg.addFooterJS("endpoint/list", "endpoints", "js/endpoint.js");
+    }
+});
+%>
