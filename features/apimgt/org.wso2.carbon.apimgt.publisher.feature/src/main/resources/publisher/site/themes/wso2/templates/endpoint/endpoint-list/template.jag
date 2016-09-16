@@ -26,13 +26,6 @@
 <%
 %>
 <script id="endpoint-actions" type="text/x-handlebars-template">
-  <a title="View" href="<%=jagg.urlTenanted("/site/pages/endpoint.jag?name={{ name }}")%>" class="btn  btn-sm padding-reduce-on-grid-view">
-      <span class="fw-stack">
-          <i class="fw fw-ring fw-stack-2x"></i>
-          <i class="fw fw-view fw-stack-1x"></i>
-      </span>
-      <span class="hidden-xs"><%=i18n.localize("View")%></span>
-  </a>
 
   <a title="Edit" href="<%=jagg.urlTenanted("/site/pages/endpoint-edit.jag?name={{ name }}")%>" class="btn  btn-sm padding-reduce-on-grid-view">
       <span class="fw-stack">
@@ -50,10 +43,4 @@
       <span class="hidden-xs"><%=i18n.localize("Delete")%></span>
   </a>
 </script>
-
-<script id="endpoint-name" type="text/x-handlebars-template">
-  <a title="endpoints" href="<%=jagg.urlTenanted("/site/pages/endpoint.jag?name={{ name }}")%>">{{ name }}</a>
-</script>
-
- 
 <% }); %>
