@@ -2,7 +2,7 @@
 <div class="page-header" id="Message">
     <h2><%=i18n.localize("Endpoints")%></h2>
 </div>
-<p><%=i18n.localize("Endpoint definition represent the details of a backend of a API ")%></p>
+<p><%=i18n.localize("Endpoint definition represent the details of a backend of a API")%></p>
 
 <div id="endpoint-list">
   <div  id="endpoint-table-nodata" class="hide message message-info">
@@ -23,11 +23,10 @@
     </table>
   </div>
 </div>
-<%
-%>
+
 <script id="endpoint-actions" type="text/x-handlebars-template">
 
-  <a title="Edit" href="<%=jagg.urlTenanted("/site/pages/endpoint-edit.jag?name={{ name }}")%>" class="btn  btn-sm padding-reduce-on-grid-view">
+  <a title="Edit" href="<%=jagg.url("/site/pages/endpoint-edit.jag?name={{ name }}")%>" class="btn  btn-sm padding-reduce-on-grid-view">
       <span class="fw-stack">
           <i class="fw fw-ring fw-stack-2x"></i>
           <i class="fw fw-edit fw-stack-1x"></i>

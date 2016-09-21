@@ -1,57 +1,79 @@
-function deleteApp(linkObj) {
-    jagg.sessionAwareJS({redirect:'site/pages/applications.jag'});
-    var theTr = $(linkObj).parent().parent();
-    var appName = $(theTr).attr('data-value');
-    var apiCount = $(theTr).attr('api-count');
-    $('#messageModal').html($('#confirmation-data').html());
-    if(apiCount > 0){
-        $('#messageModal h3.modal-title').html(i18n.t("Confirm Delete"));
-        $('#messageModal div.modal-body').text('\n\n' +i18n.t("This application is subscribed to ")
-            + apiCount + i18n.t(" APIs. ") +i18n.t("Confirm Delete")+'"' + appName + '"'+i18n.t("? This will cancel all the existing subscriptions and keys associated with the application. "));
-    } else {
-        $('#messageModal h3.modal-title').html(i18n.t("Confirm Delete"));
-        $('#messageModal div.modal-body').text('\n\n'+i18n.t("Are you sure you want to remove the application ")+'"' + appName + '" ?');
-    }
-    $('#messageModal a.btn-primary').html(i18n.t("Yes"));
-    $('#messageModal a.btn-other').html(i18n.t("No"));
-    $('#messageModal a.btn-primary').click(function() {
-        jagg.post("/site/blocks/application/application-remove/ajax/application-remove.jag", {
-            action:"removeApplication",
-            application:appName
-        }, function (result) {
-            if (!result.error) {
-                window.location.reload(true);
-            } else {
-                jagg.message({content:result.message,type:"error"});
-            }
-        }, "json");
-    });
-    $('#messageModal a.btn-other').click(function() {
-        window.location.reload(true);
-    });
-    $('#messageModal').modal();
-
-}
-
-function hideMsg() {
-    $('#applicationTable tr:last').css("background-color", "");
-    $('#appAddMessage').hide("fast");
-}
-
 $(document).ready(function() {
-    if ($.cookie('highlight') != null && $.cookie('highlight') == "true") {
-        $.cookie('highlight', "false");
+    $("#endpoint-actions").each(function(){
+        var source   = $("#endpoint-actions").html();
+        var endpoint_actions = Handlebars.compile(source);
 
-        $('#applicationTable tr:last').css("background-color", "#d1dce3");
-        if($.cookie('lastAppStatus')=='CREATED'){
-        $('#appAddPendingMessage').show();
-        $('#applicationPendingShowName').text($.cookie('lastAppName'));
-        var t = setTimeout("hideMsg()", 3000);
-        }else{
-        $('#appAddMessage').show();
-        $('#applicationShowName').text($.cookie('lastAppName'));
-        var t = setTimeout("hideMsg()", 3000);
+        var source   = $("#endpoint-name").html();
+        var endpoint_name = Handlebars.compile(source);
 
-        }
-    }
+        var endpoint_list = $('#endpoint-table').datatables_extended({
+            serverSide: true,
+            processing: true,
+            paging: true,
+            "ajax": {
+                "url": jagg.url("/site/blocks/endpoint/endpoint-list/ajax/endpoint-list.jag?action=getEndpointsWithPagination"),
+                "dataSrc": function ( json ) {
+                    if(json.endpoints.length > 0){
+                        $('#endpoint-table-wrap').removeClass("hide");
+                    }
+                    else{
+                        $('#endpoint-table-nodata').removeClass("hide");
+                    }
+                    return json.endpoints
+                }
+            },
+            "columns": [
+                { "data": "name",
+                    "render": function(data, type, rec, meta){
+                        return  endpoint_name(context);
+                    }
+                },
+                { "data": "version" },
+                { "data": "type" }
+            ],
+        });
+
+        $('#endpoint-table').on( 'click', 'a.deleteEndpoint', function () {
+            var appName = $(this).attr("data-id");
+            var apiCount = $(this).attr("data-count");
+            $('#messageModal').html($('#confirmation-data').html());
+            if(apiCount > 0){
+                $('#messageModal h3.modal-title').html(i18n.t("Confirm Delete"));
+                $('#messageModal div.modal-body').text('\n\n' +i18n.t("This endpoint is subscribed to ")
+                    + apiCount + i18n.t(" APIs. ") +i18n.t("Are you sure you want to remove the endpoint ")+'"' + appName + '"'+i18n.t("? This will cancel all the existing subscriptions and keys associated with the endpoint. "));
+            } else {
+                $('#messageModal h3.modal-title').html(i18n.t("Confirm Delete"));
+                $('#messageModal div.modal-body').text('\n\n'+i18n.t("Are you sure you want to remove the endpoint ")+'"' + appName + '" ?');
+            }
+            $('#messageModal a.btn-primary').html(i18n.t("Yes"));
+            $('#messageModal a.btn-other').html(i18n.t("No"));
+            $('#messageModal a.btn-primary').click(function() {
+                jagg.post("/site/blocks/endpoint/endpoint-remove/ajax/endpoint-remove.jag", {
+                    action:"removeApplication",
+                    endpoint:appName
+                }, function (result) {
+                    if (!result.error) {
+                        window.location.reload(true);
+                    } else {
+                        jagg.message({content:result.message,type:"error"});
+                    }
+                }, "json");
+            });
+            $('#messageModal a.btn-other').click(function() {
+                window.location.reload(true);
+            });
+            $('#messageModal').modal();
+
+
+        });
+    });
+
+    $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+        $(".curl_command").each(function(){ $(this).data("plugin_codeHighlight").editor.refresh()});
+    });
+
 });
+
+
+
+
