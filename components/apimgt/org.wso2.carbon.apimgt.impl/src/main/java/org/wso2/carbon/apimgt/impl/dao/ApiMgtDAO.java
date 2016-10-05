@@ -11062,7 +11062,64 @@ public class ApiMgtDAO {
     }
 
     public void addEdpoint(Endpoint endpoint) {
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
 
+        String query = SQLConstants.ADD_API_SQL;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
+
+            prepStmt = connection.prepareStatement(query, new String[]{"api_id"});
+            prepStmt.setString(1, APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+            prepStmt.setString(2, api.getId().getApiName());
+            prepStmt.setString(3, api.getId().getVersion());
+            prepStmt.setString(4, api.getContext());
+            String contextTemplate = api.getContextTemplate();
+            //Validate if the API has an unsupported context before executing the query
+            String invalidContext = "/" + APIConstants.VERSION_PLACEHOLDER;
+            if (invalidContext.equals(contextTemplate)) {
+                throw new APIManagementException("Cannot add API : " + api.getId() + " with unsupported context : "
+                        + contextTemplate);
+            }
+            //If the context template ends with {version} this means that the version will be at the end of the context.
+            if (contextTemplate.endsWith("/" + APIConstants.VERSION_PLACEHOLDER)) {
+                //Remove the {version} part from the context template.
+                contextTemplate = contextTemplate.split(Pattern.quote("/" + APIConstants.VERSION_PLACEHOLDER))[0];
+            }
+            prepStmt.setString(5, contextTemplate);
+            prepStmt.setString(6, APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+            prepStmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+            prepStmt.setString(8, api.getApiLevelPolicy());
+            prepStmt.execute();
+
+            rs = prepStmt.getGeneratedKeys();
+            int applicationId = -1;
+            if (rs.next()) {
+                applicationId = rs.getInt(1);
+            }
+
+            connection.commit();
+
+            if (api.getScopes() != null) {
+                addScopes(api.getScopes(), applicationId, tenantId);
+            }
+            addURLTemplates(applicationId, api, connection);
+            String tenantUserName = MultitenantUtils
+                    .getTenantAwareUsername(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+            recordAPILifeCycleEvent(api.getId(), null, APIStatus.CREATED.toString(), tenantUserName, tenantId,
+                    connection);
+            //If the api is selected as default version, it is added/replaced into AM_API_DEFAULT_VERSION table
+            if (api.isDefaultVersion()) {
+                addUpdateAPIAsDefaultVersion(api, connection);
+            }
+            connection.commit();
+        } catch (SQLException e) {
+            handleException("Error while adding the API: " + api.getId() + " to the database", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+        }
     }
 
     public void updateEdpoint(Endpoint endpoint) {

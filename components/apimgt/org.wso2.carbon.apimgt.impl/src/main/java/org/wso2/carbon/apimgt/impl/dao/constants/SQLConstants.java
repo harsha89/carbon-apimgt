@@ -2522,6 +2522,10 @@ public class SQLConstants {
 
     /** Throttle related constants**/
 
+    public static final String ADD_ENDPOINT_SQL =
+            " INSERT INTO AM_ENDPOINT (NAME, VERSION, IS_SECURED, CONTEXT,CONTEXT_TEMPLATE,CREATED_BY,CREATED_TIME, API_TIER)" +
+                    " VALUES (?,?,?,?,?,?,?,?)";
+
     public static class ThrottleSQLConstants{
 
     	public static final String QUOTA_TYPE_BANDWIDTH = PolicyConstants.BANDWIDTH_TYPE;
