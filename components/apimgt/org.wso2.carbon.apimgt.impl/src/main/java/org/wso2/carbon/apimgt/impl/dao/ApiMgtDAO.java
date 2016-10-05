@@ -11030,15 +11030,39 @@ public class ApiMgtDAO {
         return accessTokens;
     }
 
-    public Endpoint getEdpoints(int tenantId) {
+    /**
+     * Get all endpoints of a tenant user
+     *
+     * @param tenantId Tenant id of the user
+     * @return list of endpoints belongs to given tenant
+     */
+    public List<Endpoint> getEdpoints(int tenantId) {
         return null;
     }
 
+    /**
+     * Get endpoints with pagination of a tenant user
+     *
+     * @param tenantId Tenant id of the user
+     * @return list of endpoints belongs to given tenant
+     */
+    public List<Endpoint> getEndpointsWithPagination(int tenantId) {
+
+    }
+
+    /**
+     * Get endpoint by name
+     *
+     * @param name name of the endpoint
+     * @param tenantId tenant id of the user
+     * @return endpoint details
+     */
     public Endpoint getEdpointByName(String name, int tenantId) {
         return null;
     }
 
     public void addEdpoint(Endpoint endpoint) {
+
     }
 
     public void updateEdpoint(Endpoint endpoint) {
