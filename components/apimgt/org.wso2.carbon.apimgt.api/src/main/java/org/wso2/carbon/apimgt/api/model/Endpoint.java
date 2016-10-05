@@ -17,9 +17,6 @@
 */
 package org.wso2.carbon.apimgt.api.model;
 
-import java.io.Serializable;
-import java.util.Date;
-
 /**
  * Endpoint configutation holder class.
  *  */
@@ -29,7 +26,7 @@ public class Endpoint {
     private String version;
     private String description;
     private boolean endpointSecured;
-    private String endPointAuthDigest;
+    private String authType;
     private String endpointConfig;
     private String endpointUsername;
     private char[] endpointPassword;
@@ -61,12 +58,12 @@ public class Endpoint {
         this.endpointSecured = endpointSecured;
     }
 
-    public String getEndPointAuthDigest() {
-        return endPointAuthDigest;
+    public String getAuthType() {
+        return authType;
     }
 
-    public void setEndPointAuthDigest(String endPointAuthDigest) {
-        this.endPointAuthDigest = endPointAuthDigest;
+    public void setAuthType(String authType) {
+        this.authType = authType;
     }
 
     public String getEndpointConfig() {

@@ -6277,7 +6277,7 @@ public final class APIUtil {
             artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_USERNAME, endpoint.getEndpointUsername());
             artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_PASSWORD, new String(endpoint.getEndpointPassword()));
             artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_CONFIG, endpoint.getEndpointConfig());
-            artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_AUTH_DIGEST, endpoint.getEndPointAuthDigest());
+            artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_AUTH_DIGEST, endpoint.getAuthType());
             artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_VISIBLE_ROLES, endpoint.getVisibleRoles());
             artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_TYPE, endpoint.getEndpointType());
             artifact.setAttribute(APIConstants.ENDPOINT_OVERVIEW_CREATOR, endpoint.getCreator());
@@ -6308,7 +6308,7 @@ public final class APIUtil {
             endpoint.setEndpointUsername(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_USERNAME));
             endpoint.setEndpointPassword(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_PASSWORD).toCharArray());
             endpoint.setEndpointConfig(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_CONFIG));
-            endpoint.setEndPointAuthDigest(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_AUTH_DIGEST));
+            endpoint.setAuthType(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_AUTH_DIGEST));
             endpoint.setVisibleRoles(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_VISIBLE_ROLES));
             endpoint.setEndpointType(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_ENDPOINT_TYPE));
             endpoint.setCreator(artifact.getAttribute(APIConstants.ENDPOINT_OVERVIEW_CREATOR));

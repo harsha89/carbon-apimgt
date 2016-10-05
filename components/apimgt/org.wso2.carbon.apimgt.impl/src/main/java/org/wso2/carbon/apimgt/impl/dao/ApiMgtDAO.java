@@ -57,8 +57,6 @@ import org.wso2.carbon.apimgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
 import org.wso2.carbon.apimgt.impl.factory.SQLConstantManagerFactory;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
-//import org.wso2.carbon.apimgt.impl.token.JWTGenerator;
-//import org.wso2.carbon.apimgt.impl.token.TokenGenerator;
 import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionComparator;
@@ -85,7 +83,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -108,6 +112,9 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+//import org.wso2.carbon.apimgt.impl.token.JWTGenerator;
+//import org.wso2.carbon.apimgt.impl.token.TokenGenerator;
 
 /**
  * This class represent the ApiMgtDAO.
@@ -11061,64 +11068,52 @@ public class ApiMgtDAO {
         return null;
     }
 
-    public void addEdpoint(Endpoint endpoint) {
+    public void addEdpoint(Endpoint endpoint, int tenantId) throws APIManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
-
-        String query = SQLConstants.ADD_API_SQL;
+        InputStream endpointConfigStream = null;
+        String query = SQLConstants.ADD_ENDPOINT_SQL;
         try {
             connection = APIMgtDBUtil.getConnection();
-            connection.setAutoCommit(false);
+            connection.setAutoCommit(true);
+            prepStmt = connection.prepareStatement(query);
+            prepStmt.setString(1, endpoint.getName());
+            prepStmt.setString(2, endpoint.getVersion());
+            prepStmt.setBoolean(3, endpoint.isEndpointSecured());
+            prepStmt.setString(4, endpoint.getAuthType());
+            prepStmt.setString(5, endpoint.getEndpointUsername());
+            char[] password = endpoint.getEndpointPassword();
+            if (password != null) {
+                prepStmt.setString(6, String.valueOf(password));
+            } else {
+                prepStmt.setString(6, null);
+            }
+            prepStmt.setString(7, endpoint.getVisibleRoles());
 
-            prepStmt = connection.prepareStatement(query, new String[]{"api_id"});
-            prepStmt.setString(1, APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-            prepStmt.setString(2, api.getId().getApiName());
-            prepStmt.setString(3, api.getId().getVersion());
-            prepStmt.setString(4, api.getContext());
-            String contextTemplate = api.getContextTemplate();
-            //Validate if the API has an unsupported context before executing the query
-            String invalidContext = "/" + APIConstants.VERSION_PLACEHOLDER;
-            if (invalidContext.equals(contextTemplate)) {
-                throw new APIManagementException("Cannot add API : " + api.getId() + " with unsupported context : "
-                        + contextTemplate);
-            }
-            //If the context template ends with {version} this means that the version will be at the end of the context.
-            if (contextTemplate.endsWith("/" + APIConstants.VERSION_PLACEHOLDER)) {
-                //Remove the {version} part from the context template.
-                contextTemplate = contextTemplate.split(Pattern.quote("/" + APIConstants.VERSION_PLACEHOLDER))[0];
-            }
-            prepStmt.setString(5, contextTemplate);
-            prepStmt.setString(6, APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-            prepStmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
-            prepStmt.setString(8, api.getApiLevelPolicy());
+            byte[] byteArray = endpoint.getEndpointConfig().getBytes(Charset.defaultCharset());
+            int lengthOfBytes = byteArray.length;
+            endpointConfigStream = new ByteArrayInputStream(byteArray);
+            prepStmt.setBinaryStream(8, endpointConfigStream, lengthOfBytes);
+
+            prepStmt.setString(9, endpoint.getCreator());
+            prepStmt.setTimestamp(10, new Timestamp(System.currentTimeMillis()));
+            prepStmt.setString(11, endpoint.getCreator());
+            prepStmt.setTimestamp(12, new Timestamp(System.currentTimeMillis()));
+            prepStmt.setString(13, UUID.randomUUID().toString());
+            prepStmt.setInt(14, tenantId);
             prepStmt.execute();
-
-            rs = prepStmt.getGeneratedKeys();
-            int applicationId = -1;
-            if (rs.next()) {
-                applicationId = rs.getInt(1);
-            }
-
-            connection.commit();
-
-            if (api.getScopes() != null) {
-                addScopes(api.getScopes(), applicationId, tenantId);
-            }
-            addURLTemplates(applicationId, api, connection);
-            String tenantUserName = MultitenantUtils
-                    .getTenantAwareUsername(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-            recordAPILifeCycleEvent(api.getId(), null, APIStatus.CREATED.toString(), tenantUserName, tenantId,
-                    connection);
-            //If the api is selected as default version, it is added/replaced into AM_API_DEFAULT_VERSION table
-            if (api.isDefaultVersion()) {
-                addUpdateAPIAsDefaultVersion(api, connection);
-            }
-            connection.commit();
         } catch (SQLException e) {
-            handleException("Error while adding the API: " + api.getId() + " to the database", e);
+            handleException("Error while adding the endpoint: " + endpoint.getName() + " to the database", e);
         } finally {
-            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+            if(endpointConfigStream != null) {
+                try {
+                    endpointConfigStream.close();
+                } catch (IOException e) {
+                    //Nothing to do here
+                }
+            }
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, null);
         }
     }
 
