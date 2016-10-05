@@ -19,6 +19,10 @@
     var listUrl = jagg.getAbsoluteUrl("/site/pages/index.jag") + urlPrefix;
     var listMappedUrl = jagg.getMappedUrl("/site/pages/index.jag") + urlPrefix;
 
+    var endpointListUrl = jagg.getAbsoluteUrl("/site/pages/endpoints.jag") + urlPrefix;
+    var endpointListMappedUrl = jagg.getMappedUrl("/site/pages/endpoints.jag") + urlPrefix;
+    var editEndpointUrl = jagg.getMappedUrl("/site/pages/endpoint-edit.jag") + urlPrefix;
+
     var infoUrl = jagg.getAbsoluteUrl("/site/pages/item-info.jag") + urlPrefix;
     ;
     var infoMappedUrl = jagg.getMappedUrl("/site/pages/item-info.jag") + urlPrefix;
@@ -116,6 +120,19 @@
 	                        </li>
 	                        <%} %>
                         <%} %>
+
+                        <% if(reqUrl.indexOf(endpointListUrl)>=0 ||reqUrl.indexOf(endpointListMappedUrl)>=0){ %>
+	                        <li id="top-menu-api-add">
+	                            <a title="<%=i18n.localize("Add New Endpoint")%>" href="<%=editEndpointUrl%><%=urlPrefix%>" onclick="jagg.sessionAwareJS({redirect:'<%=editEndpointUrl%><%=urlPrefix%>',e:event,ssoEnabled:<%=ssoEnabled%>})">
+	                                <span class="icon fw-stack">
+	                                    <i class="fw fw-add fw-stack-1x" title="<%=i18n.localize("Add New Endpoint")%>"></i>
+	                                    <i class="fw fw-circle-outline fw-stack-2x" title="<%=i18n.localize("Add New Endpoint")%>"></i>
+	                                </span>
+	                                <%=i18n.localize("Add New Endpoint")%>
+	                            </a>
+	                        </li>
+                        <%} %>
+
                         <% if(reqUrl.indexOf(addUrl)>=0 ||reqUrl.indexOf(addMappedUrl)>=0){ %>
 	                        <li>
 	                            <a href="<%=listMappedUrl%><%=urlPrefix%>" title="<%=i18n.localize("Go Back")%>">

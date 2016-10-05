@@ -11031,10 +11031,17 @@ public class ApiMgtDAO {
     }
 
     public Endpoint getEdpoints(int tenantId) {
-
+        return null;
     }
 
     public Endpoint getEdpointByName(String name, int tenantId) {
+        return null;
+    }
+
+    public void addEdpoint(Endpoint endpoint) {
+    }
+
+    public void updateEdpoint(Endpoint endpoint) {
 
     }
 }

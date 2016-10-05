@@ -524,6 +524,8 @@
     "tierPermissions": "tierPermissions",
     "tiers": "tiers",
     "user": "user",
+    "Add New Endpoint": "Add New Endpoint",
+    "Add Endpoint": "Add Endpoint",
     "Endpoint definition represent the details of a backend of a API": "Endpoint definition represent the details of a backend of a API",
     "No endpoints defined yet. Click Add endpoint in the action bar to add an endpoint.": "No endpoints defined yet. Click Add endpoint in the action bar to add an endpoint."
 }
