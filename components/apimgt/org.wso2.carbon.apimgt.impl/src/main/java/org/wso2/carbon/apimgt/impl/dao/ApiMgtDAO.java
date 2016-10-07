@@ -11043,18 +11043,59 @@ public class ApiMgtDAO {
      * @param tenantId Tenant id of the user
      * @return list of endpoints belongs to given tenant
      */
-    public List<Endpoint> getEdpoints(int tenantId) {
-        return null;
-    }
-
-    /**
-     * Get endpoints with pagination of a tenant user
-     *
-     * @param tenantId Tenant id of the user
-     * @return list of endpoints belongs to given tenant
-     */
-    public List<Endpoint> getEndpointsWithPagination(int tenantId) {
-
+    public List<Endpoint> getEdpoints(int tenantId) throws APIManagementException {
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        Endpoint endpoint = null;
+        List<Endpoint> endpoints = new ArrayList<Endpoint>();
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
+            prepStmt = connection.prepareStatement(SQLConstants.GET_ALL_ENDPOINTS_SQL);
+            prepStmt.setInt(1, tenantId);
+            prepStmt.setInt(2, tenantId);
+            rs = prepStmt.executeQuery();
+            while (rs.next()) {
+                endpoint.setName(rs.getString(APIConstants.ENDPOINT_NAME));
+                endpoint.setVersion(rs.getString(APIConstants.ENDPOINT_VERSION));
+                endpoint.setDescription(rs.getString(APIConstants.ENDPOINT_DESCRIPTION));
+                endpoint.setEndpointSecured(rs.getBoolean(APIConstants.ENDPOINT_IS_SECURED));
+                endpoint.setAuthType(rs.getString(APIConstants.ENDPOINT_AUTH_TYPE));
+                endpoint.setEndpointUsername(rs.getString(APIConstants.ENDPOINT_USERNAME));
+                String password = rs.getString(APIConstants.ENDPOINT_PASSWORD);
+                if(!StringUtils.isEmpty(password)) {
+                    endpoint.setEndpointPassword(password.toCharArray());
+                }
+                endpoint.setVisibleRoles(rs.getString(APIConstants.ENDPOINT_VISIBLE_ROLES));
+                InputStream endpointConfigStream = rs.getBinaryStream(APIConstants.ENDPOINT_CONFIG);
+                if(endpointConfigStream != null){
+                    char[] endpointConfig = APIUtil.toByteCharArray(endpointConfigStream);
+                    endpoint.setEndpointConfig(String.valueOf(endpointConfig));
+                }
+                endpoint.setCreator(rs.getString(APIConstants.ENDPOINT_CREATED_BY));
+                Timestamp createdTimestamp = rs.getTimestamp(APIConstants.ENDPOINT_CREATED_TIME);
+                Date dateCreated = new Date(createdTimestamp.getTime());
+                endpoint.setDateCreated(dateCreated);
+                endpoint.setUpdater(rs.getString(APIConstants.ENDPOINT_UPDATED_BY));
+                Timestamp updatedTimestamp = rs.getTimestamp(APIConstants.ENDPOINT_UPDATED_TIME);
+                Date dateUpdated = new Date(updatedTimestamp.getTime());
+                endpoint.setDateUpdated(dateUpdated);
+                endpoint.setUuid(rs.getString(APIConstants.ENDPOINT_UUID));
+                endpoints.add(endpoint);
+            }
+        } catch (SQLException e) {
+            String msg = "Error occurred while getting endpoints of tenant " + tenantId;
+            log.error(msg, e);
+            throw new APIManagementException(msg, e);
+        } catch (IOException e) {
+            String msg = "Error occurred while converting endpoint config to string when retrieving endpoints of tenant " + tenantId;
+            log.error(msg, e);
+            throw new APIManagementException(msg, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+        }
+        return endpoints;
     }
 
     /**
@@ -11064,10 +11105,126 @@ public class ApiMgtDAO {
      * @param tenantId tenant id of the user
      * @return endpoint details
      */
-    public Endpoint getEdpointByName(String name, int tenantId) {
-        return null;
+    public Endpoint getEdpointByName(String name, int tenantId) throws APIManagementException {
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        Endpoint endpoint = null;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
+            prepStmt = connection.prepareStatement(SQLConstants.GET_ENDPOINT_BY_NAME_SQL);
+            prepStmt.setString(1, name);
+            prepStmt.setInt(2, tenantId);
+            rs = prepStmt.executeQuery();
+            while (rs.next()) {
+                endpoint = new Endpoint();
+                endpoint.setName(name);
+                endpoint.setVersion(rs.getString(APIConstants.ENDPOINT_VERSION));
+                endpoint.setDescription(rs.getString(APIConstants.ENDPOINT_DESCRIPTION));
+                endpoint.setEndpointSecured(rs.getBoolean(APIConstants.ENDPOINT_IS_SECURED));
+                endpoint.setAuthType(rs.getString(APIConstants.ENDPOINT_AUTH_TYPE));
+                endpoint.setEndpointUsername(rs.getString(APIConstants.ENDPOINT_USERNAME));
+                String password = rs.getString(APIConstants.ENDPOINT_PASSWORD);
+                if(!StringUtils.isEmpty(password)) {
+                    endpoint.setEndpointPassword(password.toCharArray());
+                }
+                endpoint.setVisibleRoles(rs.getString(APIConstants.ENDPOINT_VISIBLE_ROLES));
+                InputStream endpointConfigStream = rs.getBinaryStream(APIConstants.ENDPOINT_CONFIG);
+                if(endpointConfigStream != null){
+                    char[] endpointConfig = APIUtil.toByteCharArray(endpointConfigStream);
+                    endpoint.setEndpointConfig(String.valueOf(endpointConfig));
+                }
+                endpoint.setCreator(rs.getString(APIConstants.ENDPOINT_CREATED_BY));
+                Timestamp createdTimestamp = rs.getTimestamp(APIConstants.ENDPOINT_CREATED_TIME);
+                Date dateCreated = new Date(createdTimestamp.getTime());
+                endpoint.setDateCreated(dateCreated);
+                endpoint.setUpdater(rs.getString(APIConstants.ENDPOINT_UPDATED_BY));
+                Timestamp updatedTimestamp = rs.getTimestamp(APIConstants.ENDPOINT_UPDATED_TIME);
+                Date dateUpdated = new Date(updatedTimestamp.getTime());
+                endpoint.setDateUpdated(dateUpdated);
+                endpoint.setUuid(rs.getString(APIConstants.ENDPOINT_UUID));
+            }
+        } catch (SQLException e) {
+            String msg = "Error occurred while getting endpoints by name for endpoint " + name;
+            log.error(msg, e);
+            throw new APIManagementException(msg, e);
+        } catch (IOException e) {
+            String msg = "Error occurred while converting endpoint config to string for endpoint " + name;
+            log.error(msg, e);
+            throw new APIManagementException(msg, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+        }
+        return endpoint;
     }
 
+    /**
+     * Get endpoint by uuid
+     *
+     * @param uuid uuid of the endpoint
+     * @return endpoint details
+     */
+    public Endpoint getEdpointByUuid(String uuid) throws APIManagementException {
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        Endpoint endpoint = null;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
+            prepStmt = connection.prepareStatement(SQLConstants.GET_ENDPOINT_BY_UUID_SQL);
+            prepStmt.setString(1, uuid);
+            rs = prepStmt.executeQuery();
+            while (rs.next()) {
+                endpoint = new Endpoint();
+                endpoint.setName(rs.getString(APIConstants.ENDPOINT_NAME));
+                endpoint.setVersion(rs.getString(APIConstants.ENDPOINT_VERSION));
+                endpoint.setDescription(rs.getString(APIConstants.ENDPOINT_DESCRIPTION));
+                endpoint.setEndpointSecured(rs.getBoolean(APIConstants.ENDPOINT_IS_SECURED));
+                endpoint.setAuthType(rs.getString(APIConstants.ENDPOINT_AUTH_TYPE));
+                endpoint.setEndpointUsername(rs.getString(APIConstants.ENDPOINT_USERNAME));
+                String password = rs.getString(APIConstants.ENDPOINT_PASSWORD);
+                if(!StringUtils.isEmpty(password)) {
+                    endpoint.setEndpointPassword(password.toCharArray());
+                }
+                endpoint.setVisibleRoles(rs.getString(APIConstants.ENDPOINT_VISIBLE_ROLES));
+                InputStream endpointConfigStream = rs.getBinaryStream(APIConstants.ENDPOINT_CONFIG);
+                if(endpointConfigStream != null){
+                    char[] endpointConfig = APIUtil.toByteCharArray(endpointConfigStream);
+                    endpoint.setEndpointConfig(String.valueOf(endpointConfig));
+                }
+                endpoint.setCreator(rs.getString(APIConstants.ENDPOINT_CREATED_BY));
+                Timestamp createdTimestamp = rs.getTimestamp(APIConstants.ENDPOINT_CREATED_TIME);
+                Date dateCreated = new Date(createdTimestamp.getTime());
+                endpoint.setDateCreated(dateCreated);
+                endpoint.setUpdater(rs.getString(APIConstants.ENDPOINT_UPDATED_BY));
+                Timestamp updatedTimestamp = rs.getTimestamp(APIConstants.ENDPOINT_UPDATED_TIME);
+                Date dateUpdated = new Date(updatedTimestamp.getTime());
+                endpoint.setDateUpdated(dateUpdated);
+                endpoint.setUuid(uuid);
+            }
+        } catch (SQLException e) {
+            String msg = "Error occurred while getting endpoints by uuid for endpoint uuid " + uuid;
+            log.error(msg, e);
+            throw new APIManagementException(msg, e);
+        } catch (IOException e) {
+            String msg = "Error occurred while converting endpoint config to string for endpoint uuid " + uuid;
+            log.error(msg, e);
+            throw new APIManagementException(msg, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+        }
+        return endpoint;
+    }
+
+    /**
+     * Add endpoint to the database
+     *
+     * @param endpoint object that hold the endpoint configuration
+     * @param tenantId tenant id of the user
+     * @throws APIManagementException if error occurred
+     */
     public void addEdpoint(Endpoint endpoint, int tenantId) throws APIManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
@@ -11080,28 +11237,28 @@ public class ApiMgtDAO {
             prepStmt = connection.prepareStatement(query);
             prepStmt.setString(1, endpoint.getName());
             prepStmt.setString(2, endpoint.getVersion());
-            prepStmt.setBoolean(3, endpoint.isEndpointSecured());
-            prepStmt.setString(4, endpoint.getAuthType());
-            prepStmt.setString(5, endpoint.getEndpointUsername());
+            prepStmt.setString(3, endpoint.getDescription());
+            prepStmt.setBoolean(4, endpoint.isEndpointSecured());
+            prepStmt.setString(5, endpoint.getAuthType());
+            prepStmt.setString(6, endpoint.getEndpointUsername());
             char[] password = endpoint.getEndpointPassword();
             if (password != null) {
-                prepStmt.setString(6, String.valueOf(password));
+                prepStmt.setString(7, String.valueOf(password));
             } else {
-                prepStmt.setString(6, null);
+                prepStmt.setString(7, null);
             }
-            prepStmt.setString(7, endpoint.getVisibleRoles());
+            prepStmt.setString(8, endpoint.getVisibleRoles());
 
             byte[] byteArray = endpoint.getEndpointConfig().getBytes(Charset.defaultCharset());
             int lengthOfBytes = byteArray.length;
             endpointConfigStream = new ByteArrayInputStream(byteArray);
-            prepStmt.setBinaryStream(8, endpointConfigStream, lengthOfBytes);
-
-            prepStmt.setString(9, endpoint.getCreator());
-            prepStmt.setTimestamp(10, new Timestamp(System.currentTimeMillis()));
-            prepStmt.setString(11, endpoint.getCreator());
-            prepStmt.setTimestamp(12, new Timestamp(System.currentTimeMillis()));
-            prepStmt.setString(13, UUID.randomUUID().toString());
-            prepStmt.setInt(14, tenantId);
+            prepStmt.setBinaryStream(9, endpointConfigStream, lengthOfBytes);
+            prepStmt.setString(10, endpoint.getCreator());
+            prepStmt.setTimestamp(11, new Timestamp(System.currentTimeMillis()));
+            prepStmt.setString(12, endpoint.getCreator());
+            prepStmt.setTimestamp(13, new Timestamp(System.currentTimeMillis()));
+            prepStmt.setString(14, UUID.randomUUID().toString());
+            prepStmt.setInt(15, tenantId);
             prepStmt.execute();
         } catch (SQLException e) {
             handleException("Error while adding the endpoint: " + endpoint.getName() + " to the database", e);
@@ -11117,7 +11274,56 @@ public class ApiMgtDAO {
         }
     }
 
-    public void updateEdpoint(Endpoint endpoint) {
+    /**
+     * Upsate endpoint in the database
+     *
+     * @param endpoint object that hold the endpoint configuration
+     * @param tenantId tenant id of the user
+     * @throws APIManagementException if error occurred
+     */
+    public void updateEdpoint(Endpoint endpoint, int tenantId) throws APIManagementException {
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        InputStream endpointConfigStream = null;
+        String query = SQLConstants.UPDATE_ENDPOINT_SQL;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(true);
+            prepStmt = connection.prepareStatement(query);
+            prepStmt.setString(1, endpoint.getVersion());
+            prepStmt.setString(2, endpoint.getDescription());
+            prepStmt.setBoolean(3, endpoint.isEndpointSecured());
+            prepStmt.setString(4, endpoint.getAuthType());
+            prepStmt.setString(5, endpoint.getEndpointUsername());
+            char[] password = endpoint.getEndpointPassword();
+            if (password != null) {
+                prepStmt.setString(6, String.valueOf(password));
+            } else {
+                prepStmt.setString(6, null);
+            }
+            prepStmt.setString(7, endpoint.getVisibleRoles());
 
+            byte[] byteArray = endpoint.getEndpointConfig().getBytes(Charset.defaultCharset());
+            int lengthOfBytes = byteArray.length;
+            endpointConfigStream = new ByteArrayInputStream(byteArray);
+            prepStmt.setBinaryStream(8, endpointConfigStream, lengthOfBytes);
+            prepStmt.setString(9, endpoint.getUpdater());
+            prepStmt.setTimestamp(10, new Timestamp(System.currentTimeMillis()));
+            prepStmt.setString(11, endpoint.getName());
+            prepStmt.setInt(12, tenantId);
+            prepStmt.execute();
+        } catch (SQLException e) {
+            handleException("Error while updating the endpoint: " + endpoint.getName() + " in the database", e);
+        } finally {
+            if(endpointConfigStream != null) {
+                try {
+                    endpointConfigStream.close();
+                } catch (IOException e) {
+                    //Nothing to do here
+                }
+            }
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, null);
+        }
     }
 }

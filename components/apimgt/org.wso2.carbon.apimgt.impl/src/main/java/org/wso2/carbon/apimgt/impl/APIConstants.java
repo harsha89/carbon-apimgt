@@ -1237,16 +1237,19 @@ public final class APIConstants {
     }
 
     //Endpoint separation related constants
-    public static final String ENDPOINT_NAME = "overview_name";
-    public static final String ENDPOINT_OVERVIEW_VERSION = "overview_version";
-    public static final String ENDPOINT_OVERVIEW_DESCRIPTION = "overview_description";
-    public static final String ENDPOINT_OVERVIEW_ENDPOINT_SECURED = "overview_endpointSecured";
-    public static final String ENDPOINT_OVERVIEW_ENDPOINT_AUTH_DIGEST = "overview_endpointAuthDigest";
-    public static final String ENDPOINT_OVERVIEW_ENDPOINT_USERNAME = "overview_endpointUsername";
-    public static final String ENDPOINT_OVERVIEW_ENDPOINT_PASSWORD = "overview_endpointPassword";
-    public static final String ENDPOINT_OVERVIEW_ENDPOINT_CONFIG = "overview_endpointConfig";
-    public static final String ENDPOINT_OVERVIEW_VISIBILITY ="overview_visibility";
-    public static final String ENDPOINT_OVERVIEW_VISIBLE_ROLES ="overview_visibleRoles";
-    public static final String ENDPOINT_OVERVIEW_ENDPOINT_TYPE = "overview_endpointType";
-    public static final String ENDPOINT_OVERVIEW_CREATOR = "overview_creator";
+    public static final String ENDPOINT_NAME = "NAME";
+    public static final String ENDPOINT_VERSION = "VERSION";
+    public static final String ENDPOINT_DESCRIPTION = "DESCRIPTION";
+    public static final String ENDPOINT_AUTH_TYPE = "AUTH_TYPE";
+    public static final String ENDPOINT_IS_SECURED = "IS_SECURED";
+    public static final String ENDPOINT_USERNAME = "USERNAME";
+    public static final String ENDPOINT_PASSWORD = "PASSWORD";
+    public static final String ENDPOINT_VISIBLE_ROLES = "VISIBLE_ROLES";
+    public static final String ENDPOINT_CONFIG = "CONFIG";
+    public static final String ENDPOINT_CREATED_BY ="CREATED_BY";
+    public static final String ENDPOINT_CREATED_TIME ="CREATED_TIME";
+    public static final String ENDPOINT_UPDATED_BY = "UPDATED_BY";
+    public static final String ENDPOINT_UPDATED_TIME = "UPDATED_TIME";
+    public static final String ENDPOINT_UUID = "UUID";
+    public static final String ENDPOINT_TENANT_ID = "TENANT_ID";
 }

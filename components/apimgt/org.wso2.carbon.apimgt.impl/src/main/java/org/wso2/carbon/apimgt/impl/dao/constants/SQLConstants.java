@@ -2523,16 +2523,18 @@ public class SQLConstants {
     /** Throttle related constants**/
 
     public static final String ADD_ENDPOINT_SQL =
-            "INSERT INTO AM_ENDPOINT (NAME, VERSION, IS_SECURED, AUTH_TYPE, USERNAME, PASSWORD, VISIBLE_ROLES, CONFIG, " +
+            "INSERT INTO AM_ENDPOINT (NAME, VERSION, DESCRIPTION, IS_SECURED, AUTH_TYPE, USERNAME, PASSWORD, VISIBLE_ROLES, CONFIG, " +
                     "CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, UUID, TENANT_ID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     public static final String UPDATE_ENDPOINT_SQL =
-            "UPDATE AM_ENDPOINT SET VERSION = ?, IS_SECURED = ?, AUTH_TYPE = ?, USERNAME = ?, PASSWORD = ?, VISIBLE_ROLES = ?, CONFIG = ?, " +
-                    "UPDATED_BY = ?, UPDATED_TIME = ? WHERE NAME = ? AND TENANT_ID = ?";
+            "UPDATE AM_ENDPOINT SET VERSION = ?, DESCRIPTION = ?, IS_SECURED = ?, AUTH_TYPE = ?, USERNAME = ?, " +
+                    "PASSWORD = ?, VISIBLE_ROLES = ?, CONFIG = ?, UPDATED_BY = ?, UPDATED_TIME = ? WHERE NAME = ? AND TENANT_ID = ?";
 
     public static final String GET_ALL_ENDPOINTS_SQL = "SELECT " + "* " + "FROM " + "AM_ENDPOINT WHERE TENANT_ID = ?";
 
     public static final String GET_ENDPOINT_BY_UUID_SQL = "SELECT " + "* " + "FROM " + "AM_ENDPOINT WHERE UUID = ?";
+
+    public static final String GET_ENDPOINT_BY_NAME_SQL = "SELECT " + "* " + "FROM " + "AM_ENDPOINT WHERE NAME = ? AND TENANT_ID=?";
 
     public static class ThrottleSQLConstants{
 

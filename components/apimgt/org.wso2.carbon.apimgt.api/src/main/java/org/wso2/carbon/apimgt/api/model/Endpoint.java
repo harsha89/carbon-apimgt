@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -17,10 +17,11 @@
 */
 package org.wso2.carbon.apimgt.api.model;
 
+import java.util.Date;
+
 /**
  * Endpoint configutation holder class.
- *  */
-@SuppressWarnings("unused")
+*/
 public class Endpoint {
     private String name;
     private String version;
@@ -33,6 +34,18 @@ public class Endpoint {
     private String visibleRoles;
     private String endpointType;
     private String creator;
+    private Date dateCreated;
+    private String updater;
+    private Date dateUpdated;
+    private String uuid;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public String getName() {
         return name;
@@ -120,5 +133,29 @@ public class Endpoint {
 
     public void setCreator(String creator) {
         this.creator = creator;
+    }
+
+    public String getUpdater() {
+        return updater;
+    }
+
+    public void setUpdater(String updater) {
+        this.updater = updater;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(Date dateUpdated) {
+        this.dateUpdated = dateUpdated;
     }
 }

@@ -6058,6 +6058,11 @@ public final class APIUtil {
     	return IOUtils.toByteArray(is);
     }
 
+    public static char[] toByteCharArray(InputStream is) throws IOException{
+        return IOUtils.toCharArray(is);
+    }
+
+
     public static long ipToLong(String ipAddress) {
         long result = 0;
         String[] ipAddressInArray = ipAddress.split("\\.");
