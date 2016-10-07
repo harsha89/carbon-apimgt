@@ -11043,7 +11043,8 @@ public class ApiMgtDAO {
      * @param tenantId Tenant id of the user
      * @return list of endpoints belongs to given tenant
      */
-    public List<Endpoint> getEdpoints(int tenantId) throws APIManagementException {
+    public List<Endpoint> getPaginatedEndpoints(int tenantId, int startSubIndex, int endSubIndex)
+                                                                                         throws APIManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
@@ -11057,6 +11058,69 @@ public class ApiMgtDAO {
             prepStmt.setInt(2, tenantId);
             rs = prepStmt.executeQuery();
             while (rs.next()) {
+                endpoint = new Endpoint();
+                endpoint.setName(rs.getString(APIConstants.ENDPOINT_NAME));
+                endpoint.setVersion(rs.getString(APIConstants.ENDPOINT_VERSION));
+                endpoint.setDescription(rs.getString(APIConstants.ENDPOINT_DESCRIPTION));
+                endpoint.setEndpointSecured(rs.getBoolean(APIConstants.ENDPOINT_IS_SECURED));
+                endpoint.setAuthType(rs.getString(APIConstants.ENDPOINT_AUTH_TYPE));
+                endpoint.setEndpointUsername(rs.getString(APIConstants.ENDPOINT_USERNAME));
+                String password = rs.getString(APIConstants.ENDPOINT_PASSWORD);
+                if(!StringUtils.isEmpty(password)) {
+                    endpoint.setEndpointPassword(password.toCharArray());
+                }
+                endpoint.setVisibleRoles(rs.getString(APIConstants.ENDPOINT_VISIBLE_ROLES));
+                InputStream endpointConfigStream = rs.getBinaryStream(APIConstants.ENDPOINT_CONFIG);
+                if(endpointConfigStream != null){
+                    char[] endpointConfig = APIUtil.toByteCharArray(endpointConfigStream);
+                    endpoint.setEndpointConfig(String.valueOf(endpointConfig));
+                }
+                endpoint.setCreator(rs.getString(APIConstants.ENDPOINT_CREATED_BY));
+                Timestamp createdTimestamp = rs.getTimestamp(APIConstants.ENDPOINT_CREATED_TIME);
+                Date dateCreated = new Date(createdTimestamp.getTime());
+                endpoint.setDateCreated(dateCreated);
+                endpoint.setUpdater(rs.getString(APIConstants.ENDPOINT_UPDATED_BY));
+                Timestamp updatedTimestamp = rs.getTimestamp(APIConstants.ENDPOINT_UPDATED_TIME);
+                Date dateUpdated = new Date(updatedTimestamp.getTime());
+                endpoint.setDateUpdated(dateUpdated);
+                endpoint.setUuid(rs.getString(APIConstants.ENDPOINT_UUID));
+                endpoints.add(endpoint);
+            }
+        } catch (SQLException e) {
+            String msg = "Error occurred while getting endpoints of tenant " + tenantId;
+            log.error(msg, e);
+            throw new APIManagementException(msg, e);
+        } catch (IOException e) {
+            String msg = "Error occurred while converting endpoint config to string when retrieving endpoints of tenant " + tenantId;
+            log.error(msg, e);
+            throw new APIManagementException(msg, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+        }
+        return endpoints;
+    }
+
+    /**
+     * Get all endpoints of a tenant user
+     *
+     * @param tenantId Tenant id of the user
+     * @return list of endpoints belongs to given tenant
+     */
+    public List<Endpoint> getEndpoints(int tenantId) throws APIManagementException {
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        Endpoint endpoint = null;
+        List<Endpoint> endpoints = new ArrayList<Endpoint>();
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
+            prepStmt = connection.prepareStatement(SQLConstants.GET_ALL_ENDPOINTS_SQL);
+            prepStmt.setInt(1, tenantId);
+            prepStmt.setInt(2, tenantId);
+            rs = prepStmt.executeQuery();
+            while (rs.next()) {
+                endpoint = new Endpoint();
                 endpoint.setName(rs.getString(APIConstants.ENDPOINT_NAME));
                 endpoint.setVersion(rs.getString(APIConstants.ENDPOINT_VERSION));
                 endpoint.setDescription(rs.getString(APIConstants.ENDPOINT_DESCRIPTION));
@@ -11105,7 +11169,7 @@ public class ApiMgtDAO {
      * @param tenantId tenant id of the user
      * @return endpoint details
      */
-    public Endpoint getEdpointByName(String name, int tenantId) throws APIManagementException {
+    public Endpoint getEndpointByName(String name, int tenantId) throws APIManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
@@ -11165,7 +11229,7 @@ public class ApiMgtDAO {
      * @param uuid uuid of the endpoint
      * @return endpoint details
      */
-    public Endpoint getEdpointByUuid(String uuid) throws APIManagementException {
+    public Endpoint getEndpointByUuid(String uuid) throws APIManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
@@ -11225,7 +11289,7 @@ public class ApiMgtDAO {
      * @param tenantId tenant id of the user
      * @throws APIManagementException if error occurred
      */
-    public void addEdpoint(Endpoint endpoint, int tenantId) throws APIManagementException {
+    public void addEndpoint(Endpoint endpoint, int tenantId) throws APIManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
@@ -11281,7 +11345,7 @@ public class ApiMgtDAO {
      * @param tenantId tenant id of the user
      * @throws APIManagementException if error occurred
      */
-    public void updateEdpoint(Endpoint endpoint, int tenantId) throws APIManagementException {
+    public void updateEndpoint(Endpoint endpoint, int tenantId) throws APIManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
@@ -11323,6 +11387,55 @@ public class ApiMgtDAO {
                     //Nothing to do here
                 }
             }
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, null);
+        }
+    }
+
+    /**
+     * Delete endpoint from database by name
+     *
+     * @param endpointName name of the endpoint to delete
+     * @param tenantId tenant id of the enpoint
+     * @throws APIManagementException if error occurred
+     */
+    public void deleteEndpointByName(String endpointName, int tenantId) throws APIManagementException {
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        InputStream endpointConfigStream = null;
+        String query = SQLConstants.DELETE_ENDPOINT_BY_NAME_SQL;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(true);
+            prepStmt = connection.prepareStatement(query);
+            prepStmt.setString(1, endpointName);
+            prepStmt.setInt(2, tenantId);
+            prepStmt.execute();
+        } catch (SQLException e) {
+            handleException("Error while deleting the endpoint: " + endpointName + " from the database", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, null);
+        }
+    }
+
+    /**
+     * Delete endpoint from database by uuid
+     *
+     * @param uuid name of the endpoint to delete
+     * @throws APIManagementException if error occurred
+     */
+    public void deleteEndpointByUuid(String uuid) throws APIManagementException {
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        String query = SQLConstants.DELETE_ENDPOINT_BY_UUID_SQL;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(true);
+            prepStmt = connection.prepareStatement(query);
+            prepStmt.setString(1, uuid);
+            prepStmt.execute();
+        } catch (SQLException e) {
+            handleException("Error while deleting the endpoint: " + uuid + " from the database", e);
+        } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, connection, null);
         }
     }

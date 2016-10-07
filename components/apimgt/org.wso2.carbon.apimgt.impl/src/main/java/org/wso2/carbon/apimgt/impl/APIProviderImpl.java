@@ -4592,211 +4592,59 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     }
 
-    @Override
-    public Map<String, Object> getAllPaginatedEndpoints(String tenantDomain, int start, int offset, final String searchValue) throws APIManagementException {
-        Map<String, Object> result = new HashMap<String, Object>();
-        List<Endpoint> endpointSortedList = new ArrayList<Endpoint>();
-        int totalLength = 0;
-        boolean isTenantFlowStarted = false;
-
-        try {
-            String paginationLimitFromConfig = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
-                    .getAPIManagerConfiguration()
-                    .getFirstProperty(APIConstants.API_PUBLISHER_ENDPIOINTS_PER_PAGE);
-
-            // If the Config exists use it to set the pagination limit
-            final int maximumPaginationLimit;
-            if (paginationLimitFromConfig != null) {
-                // The additional 1 added to the maxPaginationLimit is to help us to determine if more Endpointss may
-                // exist so that we know that we are unable to determine the actual total Endpoiny count. We will
-                // subtract this 1 later on so that it does not interfere with the logic of the rest of the application
-                int paginationLimit = Integer.parseInt(paginationLimitFromConfig);
-                // Because the store jaggery pagination logic is 10 results per a page we need to set pagination
-                // limit to at least 11 or the pagination done at this level will conflict with the store pagination
-                // leading to some of the APIs not being displayed
-                if (paginationLimit < 11) {
-                    paginationLimit = 11;
-                    log.warn("Value of '" + APIConstants.API_PUBLISHER_ENDPIOINTS_PER_PAGE + "' is too low, defaulting to 11");
-                }
-                maximumPaginationLimit = start + paginationLimit + 1;
-            }
-            // Else if the config is not specified we go with default functionality and load all endpoints
-            else {
-                maximumPaginationLimit = Integer.MAX_VALUE;
-            }
-            Registry registry;
-            boolean inTenantMode = (tenantDomain != null);
-            if ((inTenantMode && this.tenantDomain == null) || (inTenantMode && isTenantDomainNotMatching(tenantDomain))) {
-                if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-                    PrivilegedCarbonContext.startTenantFlow();
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-                    isTenantFlowStarted = true;
-                }
-                int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
-                                                                                            .getTenantId(tenantDomain);
-                APIUtil.loadTenantRegistry(tenantId);
-                registry = ServiceReferenceHolder.getInstance().getRegistryService().
-                        getGovernanceUserRegistry(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME, tenantId);
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME);
-            } else {
-                registry = this.registry;
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
-            }
-
-            PaginationContext.init(start, offset, "ASC", APIConstants.ENDPOINT_OVERVIEW_NAME, maximumPaginationLimit);
-            GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
-            Map<String, List<String>> listMap = new HashMap<String, List<String>>();
-
-            if(!StringUtils.isEmpty(searchValue)) {
-                listMap.put(APIConstants.ENDPOINT_OVERVIEW_NAME, new ArrayList<String>() {
-                    {
-                        add(searchValue);
-                    }
-                });
-            }
-
-            if (artifactManager != null) {
-                GenericArtifact[] genericArtifacts = artifactManager.findGenericArtifacts(listMap);
-                totalLength = PaginationContext.getInstance().getLength();
-                if (genericArtifacts == null || genericArtifacts.length == 0) {
-                    result.put("endpoints", endpointSortedList);
-                    result.put("totalLength", totalLength);
-                    return result;
-                }
-                // Check to see if we can speculate that there are more APIs to be loaded
-                if (maximumPaginationLimit == totalLength) {
-                    // performance hit
-                    --totalLength; // Remove the additional 1 we added earlier when setting max pagination limit
-                }
-                int tempLength = 0;
-                for (GenericArtifact artifact : genericArtifacts) {
-
-                    Endpoint endpoint = APIUtil.createEndpointFromArtifactContent(artifact);
-
-                    if (endpoint != null) {
-                        endpointSortedList.add(endpoint);
-                    }
-                    tempLength++;
-                    if (tempLength >= totalLength) {
-                        break;
-                    }
-                }
-                Collections.sort(endpointSortedList, new EndpointNameComparator());
-            }
-
-        } catch (RegistryException e) {
-            handleException("Failed to get all Endpoints", e);
-        } catch (UserStoreException e) {
-            handleException("Failed to get all Endpoints", e);
-        } finally {
-            PaginationContext.destroy();
-            if (isTenantFlowStarted) {
-                PrivilegedCarbonContext.endTenantFlow();
-            }
-        }
-
-        result.put("endpoints", endpointSortedList);
-        result.put("totalLength", totalLength);
-        return result;
+    /**
+     * @see @APIProvider#getAllPaginatedEndpoints
+     */
+    public List<Endpoint> getAllPaginatedEndpoints(int start, int offset) throws APIManagementException {
+        return apiMgtDAO.getPaginatedEndpoints(tenantId, start, offset);
     }
 
+    /**
+     * @see @APIProvider#addEndpoint
+     */
     public void addEndpoint(Endpoint endpoint) throws APIManagementException {
-        GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
-        try {
-            GenericArtifact genericArtifact =
-                    artifactManager.newGovernanceArtifact(new QName(endpoint.getName()));
-            GenericArtifact artifact = APIUtil.createEndpointArtifactContent(genericArtifact, endpoint);
-            artifactManager.addGenericArtifact(artifact);
-            if (log.isDebugEnabled()) {
-                String logMessage = "Endpoint Name: " + endpoint.getName() + ", Endpoint Version " + endpoint.getVersion()
-                                      + " created";
-                log.debug(logMessage);
-            }
-        } catch (GovernanceException e) {
-            handleException("Error while adding endpoint governance artifact name " + endpoint.getName(), e);
-        }
+        apiMgtDAO.addEndpoint(endpoint, tenantId);
     }
 
+    /**
+     * @see @APIProvider#updateEndpoint
+     */
     public void updateEndpoint(Endpoint endpoint) throws APIManagementException {
-        GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
-        try {
-            String endpointPath = APIConstants.ENDPOINT_LOCATION + RegistryConstants.PATH_SEPARATOR + endpoint.getName();
-            Resource defaultEndpointSourceArtifact = registry.get(endpointPath);
-            GenericArtifact endpointArtifact = artifactManager.getGenericArtifact(defaultEndpointSourceArtifact.getUUID());
-            GenericArtifact artifact = APIUtil.createEndpointArtifactContent(endpointArtifact, endpoint);
-            artifactManager.updateGenericArtifact(artifact);
-            if (log.isDebugEnabled()) {
-                String logMessage = "Endpoint Name: " + endpoint.getName() + ", Endpoint Version " + endpoint.getVersion()
-                                     + " updated";
-                log.debug(logMessage);
-            }
-        } catch (GovernanceException e) {
-            handleException("Error while updating endpoint governance artifact name " + endpoint.getName(), e);
-        } catch (RegistryException e) {
-            handleException("Error while getting endpoint artifact from registry " + endpoint.getName(), e);
-        }
+        apiMgtDAO.updateEndpoint(endpoint, tenantId);
     }
 
-    public void deleteEndpoint(String endpointName) throws APIManagementException {
-        GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
-        try {
-            String defaultEndpointPath = APIConstants.ENDPOINT_LOCATION + RegistryConstants.PATH_SEPARATOR + endpointName;
-            Resource endpointSourceArtifact = registry.get(defaultEndpointPath);
-            artifactManager.removeGenericArtifact(endpointSourceArtifact.getUUID());
-            if (log.isDebugEnabled()) {
-                String logMessage = "Endpoint Name: " + endpointName + ", Endpoint Version deleted";
-                log.debug(logMessage);
-            }
-        } catch (GovernanceException e) {
-            handleException("Error while updating endpoint governance artifact name " + endpointName, e);
-        } catch (RegistryException e) {
-            handleException("Error while getting endpoint artifact from registry " + endpointName, e);
-        }
+    /**
+     * @see @APIProvider#deleteEndpointByName
+     */
+    public void deleteEndpointByName(String endpointName) throws APIManagementException {
+        apiMgtDAO.deleteEndpointByName(endpointName, tenantId);
     }
 
+    /**
+     * @see @APIProvider#deleteEndpointByUuid
+     */
+    public void deleteEndpointByUuid(String uuid) throws APIManagementException {
+        apiMgtDAO.deleteEndpointByUuid(uuid);
+    }
+
+    /**
+     * @see @APIProvider#getEndpoints
+     */
     public List<Endpoint> getEndpoints() throws APIManagementException {
-        List<Endpoint> endpointSortedList = new ArrayList<Endpoint>();
-        try {
-            String endpointsPath = APIConstants.ENDPOINT_ROOT_LOCATION;
-            GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
-            Association[] endpoints = registry.getAssociations(endpointsPath, APIConstants.PROVIDER_ASSOCIATION);
-            for (Association association : endpoints) {
-                String endpointPath = association.getDestinationPath();
-                Resource resource = registry.get(endpointPath);
-                String endpointArtifactId = resource.getUUID();
-                if (endpointArtifactId != null) {
-                    GenericArtifact endpointArtifact = artifactManager.getGenericArtifact(endpointArtifactId);
-                    endpointSortedList.add(APIUtil.createEndpointFromArtifactContent(endpointArtifact));
-                } else {
-                    throw new GovernanceException("Artifact id is null of " + endpointPath);
-                }
-            }
-
-        } catch (RegistryException e) {
-            handleException("Failed to get endpoints", e);
-        }
-        Collections.sort(endpointSortedList, new EndpointNameComparator());
-        return endpointSortedList;
+        return apiMgtDAO.getEndpoints(tenantId);
     }
 
-    public Endpoint getEndpoint(String endPointName) throws APIManagementException {
-        GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.ENDPOINT_KEY);
-        Endpoint endpoint = null;
-        try {
-            String endpointPath = APIConstants.ENDPOINT_LOCATION + RegistryConstants.PATH_SEPARATOR  + endPointName;
-            Resource endpointSourceArtifact = registry.get(endpointPath);
-            GenericArtifact endpointArtifact = artifactManager.getGenericArtifact(endpointSourceArtifact.getUUID());
-            endpoint = APIUtil.createEndpointFromArtifactContent(endpointArtifact);
-            if (log.isDebugEnabled()) {
-                String logMessage = "Endpoint Name: " + endPointName + " retrieved";
-                log.debug(logMessage);
-            }
-        } catch (GovernanceException e) {
-            handleException("Error while getting endpoint from governance artifact name " + endPointName, e);
-        } catch (RegistryException e) {
-            handleException("Error while getting endpoint artifact from registry " + endPointName, e);
-        }
-        return endpoint;
+    /**
+     * @see @APIProvider#getEndpointByName
+     */
+    public Endpoint getEndpointByName(String endPointName) throws APIManagementException {
+        return apiMgtDAO.getEndpointByName(endPointName, tenantId);
     }
 
+    /**
+     * @see @APIProvider#getEndpointByUuid
+     */
+    public Endpoint getEndpointByUuid(String uuid) throws APIManagementException {
+        return apiMgtDAO.getEndpointByUuid(uuid);
+    }
 }

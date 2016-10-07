@@ -2532,6 +2532,12 @@ public class SQLConstants {
 
     public static final String GET_ALL_ENDPOINTS_SQL = "SELECT " + "* " + "FROM " + "AM_ENDPOINT WHERE TENANT_ID = ?";
 
+    public static final String GET_PAGINATED_ENDPOINTS_SQL = "SELECT " + "* " + "FROM " + "AM_ENDPOINT WHERE TENANT_ID = ?";
+
+    public static final String DELETE_ENDPOINT_BY_NAME_SQL = "DELETE FROM AM_ENDPOINT WHERE TENANT_ID = ? AND NAME = ?";
+
+    public static final String DELETE_ENDPOINT_BY_UUID_SQL = "DELETE FROM AM_ENDPOINT WHERE UUID = ?";
+
     public static final String GET_ENDPOINT_BY_UUID_SQL = "SELECT " + "* " + "FROM " + "AM_ENDPOINT WHERE UUID = ?";
 
     public static final String GET_ENDPOINT_BY_NAME_SQL = "SELECT " + "* " + "FROM " + "AM_ENDPOINT WHERE NAME = ? AND TENANT_ID=?";

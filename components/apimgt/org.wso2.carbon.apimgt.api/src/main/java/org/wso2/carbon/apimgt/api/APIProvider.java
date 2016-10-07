@@ -822,17 +822,15 @@ public interface APIProvider extends APIManager {
     /**
      * Get the paginated APIs from publisher
      *
-     * @param tenantDomain tenant domain
      * @param start        starting number
      * @param offset       offset number
-     * @param searchValue  searching value
      * @return set of API
-     * @throws APIManagementException if failed to get Apis
+     * @throws APIManagementException if failed to get endpoints
      */
-    Map<String, Object> getAllPaginatedEndpoints(String tenantDomain, int start, int offset, String searchValue) throws APIManagementException;
+    List<Endpoint> getAllPaginatedEndpoints(int start, int offset) throws APIManagementException;
 
     /**
-     * Adds a new endpoint
+     * Add a new endpoint
      *
      * @param endpoint Endpoint
      * @throws APIManagementException if failed to add endpoint
@@ -840,7 +838,7 @@ public interface APIProvider extends APIManager {
     void addEndpoint(Endpoint endpoint) throws APIManagementException;
 
     /**
-     * Update a new endpoint
+     * Update existing endpoint
      *
      * @param endpoint Endpoint
      * @throws APIManagementException if failed to update endpoint
@@ -848,15 +846,23 @@ public interface APIProvider extends APIManager {
     void updateEndpoint(Endpoint endpoint) throws APIManagementException;
 
     /**
-     * Delete a endpoint
+     * Delete endpoint by name
      *
      * @param endpointName name of the endpoint
      * @throws APIManagementException if failed to update endpoint
      */
-    void deleteEndpoint(String endpointName) throws APIManagementException;
+    void deleteEndpointByName(String endpointName) throws APIManagementException;
 
     /**
-     * Get all endpoints of logged in tenant
+     * Delete endpoint by name
+     *
+     * @param uuid uuid of the endpoint
+     * @throws APIManagementException if failed to update endpoint
+     */
+    void deleteEndpointByUuid(String uuid) throws APIManagementException;
+
+    /**
+     * Get all endpoints of a tenant
      *
      * @throws APIManagementException if failed to update endpoint
      */
@@ -868,6 +874,6 @@ public interface APIProvider extends APIManager {
      * @param endPointName name of the endpoint
      * @throws APIManagementException if failed to update endpoint
      */
-    Endpoint getEndpoint(String endPointName) throws APIManagementException;
+    Endpoint getEndpointByName(String endPointName) throws APIManagementException;
 
 }
