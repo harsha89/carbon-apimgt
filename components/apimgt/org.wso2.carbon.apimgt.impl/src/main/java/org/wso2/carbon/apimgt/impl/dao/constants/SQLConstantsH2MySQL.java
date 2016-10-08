@@ -131,5 +131,5 @@ public class SQLConstantsH2MySQL extends SQLConstants{
             " limit ? , ? "+
             " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) ";
 
-
+    public static final String GET_PAGINATED_ENDPOINTS_SQL = "SELECT " + "* " + "FROM " + "AM_ENDPOINT WHERE TENANT_ID = ?";
 }

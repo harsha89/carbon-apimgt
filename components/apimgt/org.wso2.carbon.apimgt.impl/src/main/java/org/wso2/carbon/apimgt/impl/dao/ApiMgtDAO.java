@@ -11043,7 +11043,7 @@ public class ApiMgtDAO {
      * @param tenantId Tenant id of the user
      * @return list of endpoints belongs to given tenant
      */
-    public List<Endpoint> getPaginatedEndpoints(int tenantId, int startSubIndex, int endSubIndex)
+    public List<Endpoint> getPaginatedEndpoints(int tenantId, int startSubIndex, int endSubIndex, String searchTerm)
                                                                                          throws APIManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
@@ -11055,7 +11055,6 @@ public class ApiMgtDAO {
             connection.setAutoCommit(false);
             prepStmt = connection.prepareStatement(SQLConstants.GET_ALL_ENDPOINTS_SQL);
             prepStmt.setInt(1, tenantId);
-            prepStmt.setInt(2, tenantId);
             rs = prepStmt.executeQuery();
             while (rs.next()) {
                 endpoint = new Endpoint();
@@ -11401,7 +11400,6 @@ public class ApiMgtDAO {
     public void deleteEndpointByName(String endpointName, int tenantId) throws APIManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
-        InputStream endpointConfigStream = null;
         String query = SQLConstants.DELETE_ENDPOINT_BY_NAME_SQL;
         try {
             connection = APIMgtDBUtil.getConnection();

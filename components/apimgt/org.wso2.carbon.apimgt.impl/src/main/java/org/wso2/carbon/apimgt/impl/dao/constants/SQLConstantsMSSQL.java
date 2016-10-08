@@ -143,7 +143,7 @@ public class SQLConstantsMSSQL extends SQLConstants{
             " ORDER BY $1 $2 ";
 
 
-
+    public static final String GET_PAGINATED_ENDPOINTS_SQL = "SELECT " + "* " + "FROM " + "AM_ENDPOINT WHERE TENANT_ID = ?";
 }
 
 
