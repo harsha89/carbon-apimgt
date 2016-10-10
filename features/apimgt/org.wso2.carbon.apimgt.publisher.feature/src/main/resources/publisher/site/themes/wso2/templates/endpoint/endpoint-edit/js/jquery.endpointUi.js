@@ -1,4 +1,4 @@
-;(function ( $, window, document, undefined ) {
+(function ( $, window, document, undefined ) {
 
     var source = $("#endpoint-ui-template").html();    
     var template;
@@ -61,16 +61,13 @@
         this.element = $(element);
         this.options = $.extend( {}, defaults, options) ;
 
-        this.config = {"production_endpoints": {"url": "","config": null},"sandbox_endpoints": {"url": "","config": null},"endpoint_type": "http" };
+        this.config = {"endpoints": {"url": "","config": null},"endpoint_type": "http" };
         if(this.options.config != undefined && this.options.config != "")
             this.config = $.extend( {}, this.config, this.options.config);
 
         //following is a workaround to make prod & sand box an array
-        if(!(this.config.production_endpoints instanceof Array)){
-            this.config.production_endpoints = [ this.config.production_endpoints ];
-        }
-        if(!(this.config.sandbox_endpoints instanceof Array)){
-            this.config.sandbox_endpoints = [ this.config.sandbox_endpoints ];
+        if(!(this.config.endpoints instanceof Array)){
+            this.config.endpoints = [ this.config.endpoints ];
         }
 
         this._name = pluginName;
@@ -81,8 +78,8 @@
 
         init: function() {  
             this.render();
-            if(this._get_production_endpoint_type())
-                this._set_selected_ep(this._get_production_endpoint_type());
+            if(this._get_endpoint_type())
+                this._set_selected_ep(this._get_endpoint_type());
             this.attach_events();
         },        
 
@@ -122,19 +119,16 @@
             this.config.endpoint_type = $(e.currentTarget).val();
             this.selected_ep_type = $(e.currentTarget).val();
             if(this.config.endpoint_type == "default"){
-                this.config.production_endpoints = [{"url":"default"}];
-                this.config.sandbox_endpoints = [{"url":"default"}];
+                this.config.endpoints = [{"url":"default"}];
             }else{
-                this.config.production_endpoints = [{"url":"", endpoint_type:this._get_selected_ep() }];
-                this.config.sandbox_endpoints = [{"url":"", endpoint_type:this._get_selected_ep() }];
+                this.config.endpoints = [{"url":"", endpoint_type:this._get_selected_ep() }];
             }
             delete this.config.failOver;
             delete this.config.algoCombo ;
             delete this.config.algoClassName ;
             delete this.config.sessionManagement ;
             delete this.config.sessionTimeOut ;
-            delete this.config.production_failovers;
-            delete this.config.sandbox_failovers;
+            delete this.config.failovers;
             this.render();
         },
 
@@ -142,35 +136,24 @@
             if(e.target.checked && this.config.endpoint_type != "load_balance"){
                 $('#load_balance').prop('checked', false);
                 this.config.endpoint_type = "failover";
-                if(this.config.production_endpoints.length > 0) {
-                    this.config.production_endpoints = [this.config.production_endpoints[0]];
+                if(this.config.endpoints.length > 0) {
+                    this.config.endpoints = [this.config.endpoints[0]];
                 }
 
-                if(this.config.sandbox_endpoints.length > 0) {
-                    this.config.sandbox_endpoints = [this.config.sandbox_endpoints[0]];
-                }
-
-                this.config.production_failovers = [ { url:"", endpoint_type:this._get_selected_ep() }];
-                this.config.sandbox_failovers = [ { url:"", endpoint_type:this._get_selected_ep() }];
+                this.config.failovers = [ { url:"", endpoint_type:this._get_selected_ep() }];
             }else if(e.target.checked && this.config.endpoint_type == "load_balance"){
                 this.config.failOver ="True";
                 this.config.endpoint_type = "failover";
-                if(this.config.production_endpoints.length > 0) {
-                    this.config.production_endpoints = [this.config.production_endpoints[0]];
+                if(this.config.endpoints.length > 0) {
+                    this.config.endpoints = [this.config.endpoints[0]];
                 }
 
-                if(this.config.sandbox_endpoints.length > 0) {
-                    this.config.sandbox_endpoints = [this.config.sandbox_endpoints[0]];
-                }
-
-                this.config.production_failovers = [ { url:"", endpoint_type:this._get_selected_ep() }];
-                this.config.sandbox_failovers = [ { url:"", endpoint_type:this._get_selected_ep() }];
+                this.config.failovers = [ { url:"", endpoint_type:this._get_selected_ep() }];
             }else if(!e.target.checked && this.config.endpoint_type == "load_balance"){
                 this.config.failOver ="False";
             }else{
                 this.config.endpoint_type = this.element.find("#endpoint_type").val();
-                delete this.config.production_failovers;
-                delete this.config.sandbox_failovers
+                delete this.config.failovers;
             }
             this.render();
         },
@@ -182,12 +165,8 @@
                     this.config.failOver ="False";
                 }
 
-                if(this.config.production_endpoints.length > 0) {
-                    this.config.production_endpoints = [this.config.production_endpoints[0]];
-                }
-
-                if(this.config.sandbox_endpoints.length > 0) {
-                    this.config.sandbox_endpoints = [this.config.sandbox_endpoints[0]];
+                if(this.config.endpoints.length > 0) {
+                    this.config.endpoints = [this.config.endpoints[0]];
                 }
 
                 this.config.endpoint_type = "load_balance";                
@@ -199,10 +178,8 @@
                 this.config.endpoint_type = this.element.find("#endpoint_type").val();
                 if(this.config.failOver === "True"){
                     this.config.endpoint_type = "failover";
-                    this.config.production_endpoints = [ this.config.production_endpoints[0] ];
-                    this.config.sandbox_endpoints = [ this.config.sandbox_endpoints[0] ];
-                    this.config.production_failovers = [ { url:"", endpoint_type:this._get_selected_ep() }];
-                    this.config.sandbox_failovers = [ { url:"", endpoint_type:this._get_selected_ep() }];
+                    this.config.endpoints = [ this.config.endpoints[0] ];
+                    this.config.failovers = [ { url:"", endpoint_type:this._get_selected_ep() }];
                 }
                 delete this.config.failOver;
                 delete this.config.algoCombo ;
@@ -263,17 +240,13 @@
             //sanitize
             delete config.invalid;
             //clean empty endpoints
-            config.production_endpoints  = this._clean_empty_endpoints(config.production_endpoints);
-            config.sandbox_endpoints  = this._clean_empty_endpoints(config.sandbox_endpoints);
-            config.production_failovers  = this._clean_empty_endpoints(config.production_failovers);
-            config.sandbox_failovers  = this._clean_empty_endpoints(config.sandbox_failovers);
+            config.endpoints  = this._clean_empty_endpoints(config.endpoints);
+            config.failovers  = this._clean_empty_endpoints(config.failovers);
 
             // if other than load balanced convert prod and sand ep to object
             if(config.endpoint_type != "load_balance"){
-                if(config.production_endpoints)
-                    config.production_endpoints = config.production_endpoints[0];
-                if(config.sandbox_endpoints)
-                    config.sandbox_endpoints = config.sandbox_endpoints[0];
+                if(config.endpoints)
+                    config.endpoints = config.endpoints[0];
             }else{
                 config.algoClassName = config.algoCombo ;                
             }
@@ -336,11 +309,8 @@
         validate: function(){
             this.config.invalid = {};
             var r = true;
-            if((this.config.production_endpoints != undefined
-                && this.config.production_endpoints[0].url != "") ||
-               (this.config.sandbox_endpoints != undefined
-                && this.config.sandbox_endpoints[0].url != "")
-              ){
+            if((this.config.endpoints != undefined
+                && this.config.endpoints[0].url != "")){
                 delete this.config.invalid.endpoint;                
             }else{                
                 this.config.invalid.endpoint = true;
@@ -360,11 +330,8 @@
         validate_for_endpoint_change: function(){
             this.config.invalid = {};
             var r = true;
-            if((this.config.production_endpoints != undefined
-                && this.config.production_endpoints[0].url != "") ||
-                (this.config.sandbox_endpoints != undefined
-                && this.config.sandbox_endpoints[0].url != "")
-            ){
+            if((this.config.endpoints != undefined
+                && this.config.endpoints[0].url != "")){
                 delete this.config.invalid.endpoint;
             }else{
                 this.config.invalid.endpoint = true;
@@ -387,9 +354,9 @@
             this.element.find("#endpoint_type").val(val);
         },
 
-        _get_production_endpoint_type: function(){
-            if(this.config.production_endpoints[0].endpoint_type != undefined )
-                return this.config.production_endpoints[0].endpoint_type;
+        _get_endpoint_type: function(){
+            if(this.config.endpoints[0].endpoint_type != undefined )
+                return this.config.endpoints[0].endpoint_type;
             else
                 return false;
         }

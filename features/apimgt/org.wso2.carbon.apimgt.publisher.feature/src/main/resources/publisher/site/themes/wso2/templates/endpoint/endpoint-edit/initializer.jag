@@ -2,9 +2,8 @@
 jagg.initializer("endpoint/endpoint-edit", {
 
     preInitialize:function () {
-        jagg.addHeaderJS("application/application-add", "application-add", "templates/application/application-add/js/application-add.js");
-        jagg.addFooterJS("endpint-ui-jq", "jagg", "templates/endpoint/endpoint-add/js/jquery.endpointUi.js");
-        jagg.addFooterJS("implementation-api", "jagg", "templates/endpoint/endpoint-add/js/api-implementation.js");
+        jagg.addFooterJS("endpint-ui-jq", "jagg", "templates/endpoint/endpoint-edit/js/jquery.endpointUi.js");
+        jagg.addFooterJS("endpoint-edit.js", "jagg", "templates/endpoint/endpoint-edit/js/endpoint-edit.js");
     }
 });
 %>

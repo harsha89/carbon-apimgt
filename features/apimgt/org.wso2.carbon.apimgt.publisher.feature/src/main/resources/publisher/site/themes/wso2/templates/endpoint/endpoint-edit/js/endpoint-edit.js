@@ -1,12 +1,14 @@
-function tierChanged(element){
-    var index = element.selectedIndex;
-    var selectedDesc = $("#tierDescriptions").val().split(",")[index];
-    $("#tierHelpStr em").text(selectedDesc);
-}
-
 $(document).ready(function () {
     $.ajaxSetup({
       contentType: "application/x-www-form-urlencoded; charset=utf-8"
+    });
+
+    var endpoint_config;
+    if($('#endpoint_config').val() != ""){
+        endpoint_config = jQuery.parseJSON($('#endpoint_config').val());
+    }
+    $("#endpoint-ui").apimEndpointUi({
+        config : endpoint_config
     });
 
     var application = $("#application-name").val("");
@@ -58,20 +60,22 @@ $(document).ready(function () {
         }, "json");
     };
 
+    var showHideEndpointDivs = function showHideEndpointDivs() {
+        var isSecured = $("#endpointType").val();
+        if (isSecured == "secured") {
+                $("#endpointAuthType").show();
+                $("#credentials").show();
+        } else {
+                $("#endpointAuthType").hide();
+                $("#credentials").hide();
+        }
+    };
 
-    $("#application-name").charCount({
-			allowed: 70,
-			warning: 50,
-			counterText: i18n.t('Characters left: ')
-		});
-    $("#application-name").val('');
-
-    /*$('#application-name').keydown(function(event) {
-         if (event.which == 13) {
-               applicationAdd();
-            }
-        });*/
-   
-
+    var onSubmit = function() {
+        if(!$("#endpoint-ui").data("plugin_apimEndpointUi").validate()){
+            return;
+        }
+        $('#endpoint_config').val(JSON.stringify($("#endpoint-ui").data("plugin_apimEndpointUi").get_endpoint_config()));
+    }
 });
 

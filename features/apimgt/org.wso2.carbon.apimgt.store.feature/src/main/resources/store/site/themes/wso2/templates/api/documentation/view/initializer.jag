@@ -2,6 +2,7 @@
 jagg.initializer("api/documentation/view", {
 
     preInitialize:function () {
+        jagg.addHeaderJS("documentation.js", "documentation", "templates/api/documentation/js/documentation.js");
     }
 });
 %>

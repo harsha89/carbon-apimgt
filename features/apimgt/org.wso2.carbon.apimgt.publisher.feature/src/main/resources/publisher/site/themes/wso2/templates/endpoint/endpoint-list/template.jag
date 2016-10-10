@@ -1,8 +1,8 @@
 <% jagg.template("endpoint/endpoint-list", function(inputs, outputs, jagg) { %>
 <div class="page-header" id="Message">
     <h2><%=i18n.localize("Endpoints")%></h2>
+    <p><%=i18n.localize("Endpoint definition represent the details of a backend of a API")%></p>
 </div>
-<p><%=i18n.localize("Endpoint definition represent the details of a backend of a API")%></p>
 
 <div id="endpoint-list">
   <div  id="endpoint-table-nodata" class="hide message message-info">
