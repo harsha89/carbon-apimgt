@@ -4595,8 +4595,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     /**
      * @see @APIProvider#getAllPaginatedEndpoints
      */
-    public List<Endpoint> getAllPaginatedEndpoints(int start, int offset) throws APIManagementException {
-        return apiMgtDAO.getPaginatedEndpoints(tenantId, start, offset);
+    public List<Endpoint> getAllPaginatedEndpoints(int start, int offset, String searchTerm) throws APIManagementException {
+        return apiMgtDAO.getPaginatedEndpoints(tenantId, start, offset, searchTerm);
     }
 
     /**

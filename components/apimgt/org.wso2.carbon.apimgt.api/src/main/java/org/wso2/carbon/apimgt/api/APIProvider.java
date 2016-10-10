@@ -824,10 +824,11 @@ public interface APIProvider extends APIManager {
      *
      * @param start        starting number
      * @param offset       offset number
+     * @param searchTerm   search term
      * @return set of API
      * @throws APIManagementException if failed to get endpoints
      */
-    List<Endpoint> getAllPaginatedEndpoints(int start, int offset) throws APIManagementException;
+    List<Endpoint> getAllPaginatedEndpoints(int start, int offset, String searchTerm) throws APIManagementException;
 
     /**
      * Add a new endpoint
