@@ -877,4 +877,21 @@ public interface APIProvider extends APIManager {
      */
     Endpoint getEndpointByName(String endPointName) throws APIManagementException;
 
+    /**
+     * Get endpoint by uuid
+     *
+     * @param uuid uuid of the endpoint
+     * @return endpoint object containing details
+     * @throws APIManagementException
+     */
+    Endpoint getEndpointByUuid(String uuid) throws APIManagementException;
+
+    /**
+     * Check whether endpoint is exist
+     *
+     * @param name name of the endpoint
+     * @return boolean whether exist of not
+     * @throws APIManagementException
+     */
+    boolean isEndpointExist(String name) throws APIManagementException;
 }

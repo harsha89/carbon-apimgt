@@ -4,8 +4,8 @@ $(document).ready(function () {
     });
 
     var endpoint_config;
-    if($('#endpoint_config').val() != ""){
-        endpoint_config = jQuery.parseJSON($('#endpoint_config').val());
+    if($('#epConfig').val() != ""){
+        endpoint_config = jQuery.parseJSON($('#epConfig').val());
     }
     $("#endpoint-ui").apimEndpointUi({
         config : endpoint_config
@@ -60,22 +60,21 @@ $(document).ready(function () {
         }, "json");
     };
 
-    var showHideEndpointDivs = function showHideEndpointDivs() {
-        var isSecured = $("#endpointType").val();
-        if (isSecured == "secured") {
-                $("#endpointAuthType").show();
-                $("#credentials").show();
-        } else {
-                $("#endpointAuthType").hide();
-                $("#credentials").hide();
-        }
-    };
-
     var onSubmit = function() {
         if(!$("#endpoint-ui").data("plugin_apimEndpointUi").validate()){
             return;
         }
-        $('#endpoint_config').val(JSON.stringify($("#endpoint-ui").data("plugin_apimEndpointUi").get_endpoint_config()));
+        $('#epConfig').val(JSON.stringify($("#endpoint-ui").data("plugin_apimEndpointUi").get_endpoint_config()));
     }
 });
 
+function showHideEndpointDivs() {
+    var isSecured = $("#endpointType").val();
+    if (isSecured == "secured") {
+        $("#endpointAuthType").show();
+        $("#credentials").show();
+    } else {
+        $("#endpointAuthType").hide();
+        $("#credentials").hide();
+    }
+};

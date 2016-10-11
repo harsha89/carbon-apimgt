@@ -1252,4 +1252,5 @@ public final class APIConstants {
     public static final String ENDPOINT_UPDATED_TIME = "UPDATED_TIME";
     public static final String ENDPOINT_UUID = "UUID";
     public static final String ENDPOINT_TENANT_ID = "TENANT_ID";
+    public static final String ENDPOINT_TOTAL = "TOTAL";
 }

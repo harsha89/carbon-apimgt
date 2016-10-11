@@ -2542,6 +2542,8 @@ public class SQLConstants {
 
     public static final String GET_ENDPOINT_BY_NAME_SQL = "SELECT " + "* " + "FROM " + "AM_ENDPOINT WHERE NAME = ? AND TENANT_ID=?";
 
+    public static final String IS_ENDPOINT_EXIST_BY_NAME_SQL = "SELECT COUNT(*) AS TOTAL FROM " + "AM_ENDPOINT WHERE NAME = ? AND TENANT_ID=?";
+
     public static class ThrottleSQLConstants{
 
     	public static final String QUOTA_TYPE_BANDWIDTH = PolicyConstants.BANDWIDTH_TYPE;

@@ -1,51 +1,67 @@
 <%
 include("/jagg/jagg.jag");
 
-if(jagg.isCSRFTokenValid())
-(function () {
-    response.contentType = "application/json; charset=UTF-8";
-    var mod, obj, result, username,
-            action = request.getParameter("action"),
-            site = require("/site/conf/site.json"),
-            msg = require("/site/conf/ui-messages.jag");
+if (jagg.isCSRFTokenValid())
+    (function () {
+        response.contentType = "application/json; charset=UTF-8";
+        var mod, obj, result, username,
+                action = request.getParameter("action"),
+                site = require("/site/conf/site.json"),
+                msg = require("/site/conf/ui-messages.jag");
 
-    if(jagg.getUser() == null){
-        print({
-            error:true,
-            message:'timeout'
-        });
-        
-    }else{
-    
-    if (action === "updatePermissions" && request.getMethod() == 'POST') {
+        if (jagg.getUser() == null) {
+            print({
+                error: true,
+                message: 'timeout'
+            });
 
-        mod = jagg.module("tiers");
-        var tierPermission = {};
-        tierPermission.tierName = request.getParameter("tierName");
-        tierPermission.permissiontype = request.getParameter("permissiontype");
-        tierPermission.roles = request.getParameter("roles");
-        
-        result = mod.updateTierPermissions(tierPermission);
-        if (result.error) {
-            obj = {
-                error:result.error,
-                message:result.message
-            };
         } else {
-            obj = {
-                error:false
+
+            if (action === "addEndpoint" && request.getMethod() == 'POST') {
+                var endpointName = request.getParameter("epName");
+                var endpointVersion = request.getParameter("epVersion");
+                var endpointConfig = request.getParameter("endpoint_config");
+                var endpointVisibleRoles = request.getParameter("epRoles");
+                var endpointDescription = request.getParameter("epDescription");
+                var endpointSecurity = request.getParameter("epSecurity");
+                var endpointAuthType = request.getParameter("epAuthType");
+                var endpointUsername = request.getParameter("epUsername");
+                var endpointPassword = request.getParameter("epPassword");
+
+                if (result.error) {
+                    obj = {
+                        error: result.error,
+                        message: result.message
+                    };
+                } else {
+                    obj = {
+                        error: false
+                    }
+                }
+                print(obj);
+
+            } else if (action === "updateEndpoint" && request.getMethod() == 'POST') {
+
+                if (result.error) {
+                    obj = {
+                        error: result.error,
+                        message: result.message
+                    };
+                } else {
+                    obj = {
+                        error: false
+                    }
+                }
+                print(obj);
+
+            }  else {
+                print({
+                    error: true,
+                    message: msg.error.invalidAction(action)
+                });
             }
+
         }
-        print(obj);
-        
-    } else {
-        print({
-                  error:true,
-                  message:msg.error.invalidAction(action)
-              });
-    }
-    	
-    }
- }());
+    }());
 %>   
 %>

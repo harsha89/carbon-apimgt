@@ -4647,4 +4647,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public Endpoint getEndpointByUuid(String uuid) throws APIManagementException {
         return apiMgtDAO.getEndpointByUuid(uuid);
     }
+
+    /**
+     * @see @APIProvider#isEndpointExist
+     */
+    public boolean isEndpointExist(String name) throws APIManagementException {
+        return apiMgtDAO.isEndpointExist(name, tenantId);
+    }
 }

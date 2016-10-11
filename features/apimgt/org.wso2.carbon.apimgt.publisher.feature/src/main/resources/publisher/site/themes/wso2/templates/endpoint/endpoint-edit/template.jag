@@ -58,30 +58,6 @@
     </div>
 </div>
 
-<div class="form-group">
-    <label class="control-label col-xs-12 col-sm-3 col-md-3 col-lg-3" for="endpoint_type"><%=i18n.localize("Endpoint Type")%>:<span class="requiredAstrix">*</span>
-        <a class="help_popup" help_data="endpoint_help" data-trigger="hover" data-placement="bottom" title="endpoint_help">
-            <span class="icon fw-stack fw-lg" style="font-size:6px">
-               <i class="fw fw-circle fw-stack-2x"></i>
-               <i class="fw fw-question fw-stack-1x fw-inverse" style="font-size:8px"></i>
-            </span>
-        </a>
-    </label>
-    <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-    <% if(endpoint != null) { %>
-        <select class="form-control select required" id="endpoint_type" name="endpoint_type">
-            <option value="http">HTTP/REST Endpoint</option>
-            <option value="address">HTTP/SOAP Endpoint</option>
-        </select>
-    <% } else { %>
-        <select class="form-control select required" id="endpoint_type" name="endpoint_type">
-            <option value="http">HTTP/REST Endpoint</option>
-            <option value="address">HTTP/SOAP Endpoint</option>
-        </select>
-    <% } %>
-    </div>
-</div>
-
 <div class="form-group" id="endpointRoles">
     <label class="control-label col-sm-3" for="type"><%=i18n.localize("Visible Roles")%>:</label>
     <div class="col-sm-4">
@@ -93,7 +69,7 @@
     </div>
 </div>
 
-<input type="hidden" id="endpoint_config" name="endpoint_config" value="<%= encode.forHtmlAttribute("") %>"/>
+<input type="hidden" id="epConfig" name="epConfig" value="<%= encode.forHtmlAttribute("") %>"/>
 
 <div id="endpoint_help" class="hide">
      <strong>HTTP/REST Endpoint </strong><p><%= i18n.localize("A REST API endpoint based on a URI template")%></p>
@@ -124,6 +100,7 @@
        </select>
     <% } %>
     </div>
+    <input type="hidden" id="epSecurity" name="epSecurity" value="">
 </div>
 
 <div class="form-group" id="endpointAuthType" <% if(endpointSecured == false) { %> style="display: none;" <% } %>>
@@ -137,11 +114,12 @@
         <p id="endpointAuth_help" class="hide"><%=i18n.localize("Select the authentication scheme you require.")%></p>
     </label>
     <div class="col-sm-4">
-    <select class="select required form-control" id="endpointAuthType" name="endpointAuthType" >
-        <option value="basicAuth" <%if( true=="false"){%> selected="selected" <%}%>><%=i18n.localize("Basic Auth")%></option>
-        <option value="digestAuth" <%if(true=="true"){%> selected="selected" <%}%>><%=i18n.localize("Digest Auth")%></option>
-    </select>
+        <select class="select required form-control" id="endpointAuthType" name="endpointAuthType" >
+            <option value="basicAuth" <%if( true=="false"){%> selected="selected" <%}%>><%=i18n.localize("Basic Auth")%></option>
+            <option value="digestAuth" <%if(true=="true"){%> selected="selected" <%}%>><%=i18n.localize("Digest Auth")%></option>
+        </select>
     </div>
+    <input type="hidden" id="epAuthType" name="epAuthType" value="">
 </div>
 
 <div class="form-group" id="credentials" <% if(endpointSecured == false) { %> style="display: none;" <% } %>>
@@ -466,6 +444,15 @@
                 </div>
             </div>
         </script>
+        </div>
+
+        <div class="form-group" id="endpointDescription">
+            <label class="control-label col-sm-3" for="description"></label>
+            <div class="col-sm-4">
+               <button class="btn btn-secondary has-spinner" id="save_api">Save</button>
+               <input type="reset" class="btn btn-secondary" value="Cancel" onclick="javascript:window.location.href='./endpoints'">
+            </div>
+        </div>
 	</form>
 </div>
 <% }); %>

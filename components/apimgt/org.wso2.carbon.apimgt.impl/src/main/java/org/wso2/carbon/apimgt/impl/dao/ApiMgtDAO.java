@@ -11347,7 +11347,6 @@ public class ApiMgtDAO {
     public void updateEndpoint(Endpoint endpoint, int tenantId) throws APIManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
-        ResultSet rs = null;
         InputStream endpointConfigStream = null;
         String query = SQLConstants.UPDATE_ENDPOINT_SQL;
         try {
@@ -11436,5 +11435,42 @@ public class ApiMgtDAO {
         } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, connection, null);
         }
+    }
+
+    /**
+     * Check whether endpoint is exist or not
+     *
+     * @param name of the endpoint to delete
+     * @throws APIManagementException if error occurred
+     */
+    public boolean isEndpointExist(String name, int tenantId) throws APIManagementException {
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        String query = SQLConstants.IS_ENDPOINT_EXIST_BY_NAME_SQL;
+        ResultSet rs = null;
+        int count = 0;
+        boolean isExist = false;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(true);
+            prepStmt = connection.prepareStatement(query);
+            prepStmt.setString(1, name);
+            prepStmt.setInt(2, tenantId);
+            rs = prepStmt.executeQuery();
+            while (rs.next()) {
+                count = rs.getInt(APIConstants.ENDPOINT_TOTAL);
+            }
+
+            if(count > 0) {
+                isExist = true;
+            } else {
+                isExist = false;
+            }
+        } catch (SQLException e) {
+            handleException("Error while checking existance of the endpoint: " + name + " from the database", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+        }
+        return isExist;
     }
 }
