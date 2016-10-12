@@ -20,26 +20,17 @@ if (jagg.isCSRFTokenValid())
             if (action === "addEndpoint" && request.getMethod() == 'POST') {
                 var endpointName = request.getParameter("epName");
                 var endpointVersion = request.getParameter("epVersion");
-                var endpointConfig = request.getParameter("endpoint_config");
+                var endpointConfig = request.getParameter("epConfig");
                 var endpointVisibleRoles = request.getParameter("epRoles");
                 var endpointDescription = request.getParameter("epDescription");
                 var endpointSecurity = request.getParameter("epSecurity");
                 var endpointAuthType = request.getParameter("epAuthType");
                 var endpointUsername = request.getParameter("epUsername");
                 var endpointPassword = request.getParameter("epPassword");
-
-                if (result.error) {
-                    obj = {
-                        error: result.error,
-                        message: result.message
-                    };
-                } else {
-                    obj = {
-                        error: false
-                    }
-                }
+                obj = {
+                    error: false
+                };
                 print(obj);
-
             } else if (action === "updateEndpoint" && request.getMethod() == 'POST') {
 
                 if (result.error) {

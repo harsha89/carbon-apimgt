@@ -1,71 +1,70 @@
+var jagg = jagg || {};
+
 $(document).ready(function () {
     $.ajaxSetup({
-      contentType: "application/x-www-form-urlencoded; charset=utf-8"
+        contentType: "application/x-www-form-urlencoded; charset=utf-8"
     });
 
     var endpoint_config;
-    if($('#epConfig').val() != ""){
+    if ($('#epConfig').val() != "") {
         endpoint_config = jQuery.parseJSON($('#epConfig').val());
     }
+
     $("#endpoint-ui").apimEndpointUi({
-        config : endpoint_config
+        config: endpoint_config
     });
 
-    var application = $("#application-name").val("");
+    var endpoint = $("#endpoint-name").val("");
 
-     $.validator.addMethod('validateSpecialChars', function(value, element) {
+    $.validator.addMethod('validateSpecialChars', function (value, element) {
         return !/(["\'])/g.test(value);
-     }, i18n.t('The Name contains one or more illegal characters') + '( &nbsp;&nbsp; " &nbsp;&nbsp; \' &nbsp;&nbsp; )');
+    }, i18n.t('The Name contains one or more illegal characters') + '( &nbsp;&nbsp; " &nbsp;&nbsp; \' &nbsp;&nbsp; )');
 
-    $("#appAddForm").validate({
-        submitHandler: function(form) {
-            applicationAdd();
+    $("#endpointForm").validate({
+        submitHandler: function (form) {
+            if(!$("#endpoint-ui").data("plugin_apimEndpointUi").validate()){
+                return;
+            }
+            endpointAdd();
         }
     });
-    var applicationAdd = function(){
-        var application = $("#application-name").val();
-        var tier = $("#appTier").val();
-        var callbackUrl = $("#callback-url").val();
-        var apiPath = $("#apiPath").val();
-        var goBack = $("#goBack").val();
-        var description = $("#description").val();
-        var status='';
-        jagg.post("/site/blocks/application/application-add/ajax/application-add.jag", {
-            action:"addApplication",
-            application:application,
-            tier:tier,
-            callbackUrl:callbackUrl,
-            description:description
-        }, function (result) {
-            if (result.error == false) {
-                status=result.status;
-                var date = new Date();
-                date.setTime(date.getTime() + (3 * 1000));
-                $.cookie('highlight','true',{ expires: date});
-                $.cookie('lastAppName',application,{ expires: date});
-                $.cookie('lastAppStatus',status,{ expires: date});
-                if(goBack == "yes"){
-                    jagg.message({content:i18n.t('Return back to API detail page?'),type:'confirm',okCallback:function(){
-                    window.location.href = apiViewUrl + "?" +  apiPath;
-                    },cancelCallback:function(){
-                        window.location = jagg.url("/site/pages/application.jag?name=" + application );
-                    }});
-                } else{
-                    window.location =  jagg.url("/site/pages/application.jag?name=" + application );
-                }
 
-            } else {
-                jagg.message({content:result.message,type:"error"});
+    var endpointAdd = function () {
+        var epName = $("#epName").val();
+        var epVersion = $("#epVersion").val();
+        var epConfig = $('#epConfig').val(JSON.stringify($("#endpoint-ui").data("plugin_apimEndpointUi").get_endpoint_config()));
+        var epRoles = $("#epRoles").val();
+        var epDescription = $("#epDescription").val();
+        var epSecurity = $("#epSecurity").val();
+        var epAuthType = $("#epAuthType").val();
+        var epUsername = $("#epUsername").val();
+        var epPassword = $("#epPassword").val();
+
+        $.ajax({
+            type: "POST",
+            url: jagg.site.context + "/site/blocks/endpoint/endpoint-edit/ajax/endpoint-edit.jag",
+            data: $("#endpointForm").serialize(), // serializes the form's elements.
+            success: function(data)
+            {
+                alert(data); // show response from the php script.
             }
-        }, "json");
-    };
+        });
 
-    var onSubmit = function() {
-        if(!$("#endpoint-ui").data("plugin_apimEndpointUi").validate()){
-            return;
-        }
-        $('#epConfig').val(JSON.stringify($("#endpoint-ui").data("plugin_apimEndpointUi").get_endpoint_config()));
-    }
+       /* jagg.post("/site/blocks/endpoint/endpoint-edit/ajax/endpoint-edit.jag", {
+            action: "addEndpoint",
+            epName: epName,
+            epVersion: epVersion,
+            epConfig: epConfig,
+            epRoles: epRoles,
+            epDescription: epDescription,
+            epSecurity: epSecurity,
+            epAuthType: epAuthType,
+            epUsername: epUsername,
+            epPassword: epPassword
+        }, function (result) {
+            window.location =  jagg.url("/site/pages/endpoints.jag" );
+        }, "json");*/
+    };
 });
 
 function showHideEndpointDivs() {
@@ -73,8 +72,10 @@ function showHideEndpointDivs() {
     if (isSecured == "secured") {
         $("#endpointAuthType").show();
         $("#credentials").show();
+        $("#epSecurity").val("secured");
     } else {
         $("#endpointAuthType").hide();
         $("#credentials").hide();
+        $("#epSecurity").val("nonecured");
     }
 };
