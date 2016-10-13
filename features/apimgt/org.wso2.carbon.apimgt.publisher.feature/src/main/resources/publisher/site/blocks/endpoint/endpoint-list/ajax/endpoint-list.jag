@@ -1,51 +1,51 @@
 <%
 include("/jagg/jagg.jag");
 
-if(jagg.isCSRFTokenValid())
-(function () {
-    response.contentType = "application/json; charset=UTF-8";
-    var mod, obj, result, username,
-            action = request.getParameter("action"),
-            site = require("/site/conf/site.json"),
-            msg = require("/site/conf/ui-messages.jag");
+if (jagg.isCSRFTokenValid())
+    (function () {
+        response.contentType = "application/json; charset=UTF-8";
+        var mod, obj, result, username,
+                action = request.getParameter("action"),
+                site = require("/site/conf/site.json"),
+                msg = require("/site/conf/ui-messages.jag");
 
-    if(jagg.getUser() == null){
-        print({
-            error:true,
-            message:'timeout'
-        });
-        
-    }else{
-    
-    if (action === "updatePermissions" && request.getMethod() == 'POST') {
+        if (jagg.getUser() == null) {
+            print({
+                error: true,
+                message: 'timeout'
+            });
 
-        mod = jagg.module("tiers");
-        var tierPermission = {};
-        tierPermission.tierName = request.getParameter("tierName");
-        tierPermission.permissiontype = request.getParameter("permissiontype");
-        tierPermission.roles = request.getParameter("roles");
-        
-        result = mod.updateTierPermissions(tierPermission);
-        if (result.error) {
-            obj = {
-                error:result.error,
-                message:result.message
-            };
         } else {
-            obj = {
-                error:false
+
+            if (action === "getEndpoints" && request.getMethod() == 'GET') {
+                var provider = jagg.getUser().username;
+                var APIProviderImpl = Packages.org.wso2.carbon.apimgt.impl.APIProviderImpl;
+                var apiProvider = new APIProviderImpl(provider);
+                var endpoints = apiProvider.getEndpoints();
+                var endpointsList = [];
+                var endpoint;
+                var endpointOb;
+                for(var i = 0 ; i < endpoints.size(); i++) {
+                    endpointOb = endpoints.get(i);
+                    endpoint = {};
+                    endpoint.name = endpointOb.getName();
+                    endpoint.description = endpointOb.getDescription();
+                    endpoint.version = endpointOb.getVersion();
+                    endpointsList.push(endpoint);
+                    obj = {
+                        error: false,
+                        endpoints: endpointsList
+                    };
+                }
+                print(obj);
+            } else {
+                print({
+                    error: true,
+                    message: msg.error.invalidAction(action)
+                });
             }
+
         }
-        print(obj);
-        
-    } else {
-        print({
-                  error:true,
-                  message:msg.error.invalidAction(action)
-              });
-    }
-    	
-    }
- }());
-%>   
+    }());
+%>
 %>

@@ -2524,7 +2524,7 @@ public class SQLConstants {
 
     public static final String ADD_ENDPOINT_SQL =
             "INSERT INTO AM_ENDPOINT (NAME, VERSION, DESCRIPTION, IS_SECURED, AUTH_TYPE, USERNAME, PASSWORD, VISIBLE_ROLES, CONFIG, " +
-                    "CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, UUID, TENANT_ID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    "CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, UUID, TENANT_ID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     public static final String UPDATE_ENDPOINT_SQL =
             "UPDATE AM_ENDPOINT SET VERSION = ?, DESCRIPTION = ?, IS_SECURED = ?, AUTH_TYPE = ?, USERNAME = ?, " +

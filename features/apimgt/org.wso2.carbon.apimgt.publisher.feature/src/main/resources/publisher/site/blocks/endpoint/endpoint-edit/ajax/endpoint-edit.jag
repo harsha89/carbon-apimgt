@@ -27,6 +27,7 @@ if (jagg.isCSRFTokenValid())
                 var endpointAuthType = request.getParameter("epAuthType");
                 var endpointUsername = request.getParameter("epUsername");
                 var endpointPassword = request.getParameter("epPassword");
+                var provider = jagg.getUser().username;
                 var Endpoint = Packages.org.wso2.carbon.apimgt.api.model.Endpoint;
                 var endpoint = new Endpoint();
                 endpoint.setName(String(endpointName));
@@ -42,7 +43,7 @@ if (jagg.isCSRFTokenValid())
                 endpoint.setEndpointConfig(String(endpointConfig));
                 endpoint.setVisibleRoles(String(endpointVisibleRoles));
                 endpoint.setVersion(String(endpointVersion));
-                var provider = jagg.getUser().username;
+                endpoint.setCreator(provider);
                 var APIProviderImpl = Packages.org.wso2.carbon.apimgt.impl.APIProviderImpl;
                 var apiProvider = new APIProviderImpl(provider);
                 apiProvider.addEndpoint(endpoint);

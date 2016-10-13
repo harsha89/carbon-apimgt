@@ -11116,7 +11116,6 @@ public class ApiMgtDAO {
             connection.setAutoCommit(false);
             prepStmt = connection.prepareStatement(SQLConstants.GET_ALL_ENDPOINTS_SQL);
             prepStmt.setInt(1, tenantId);
-            prepStmt.setInt(2, tenantId);
             rs = prepStmt.executeQuery();
             while (rs.next()) {
                 endpoint = new Endpoint();

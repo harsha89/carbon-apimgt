@@ -3,33 +3,32 @@ $(document).ready(function() {
         var source   = $("#endpoint-actions").html();
         var endpoint_actions = Handlebars.compile(source);
 
-        var source   = $("#endpoint-name").html();
-        var endpoint_name = Handlebars.compile(source);
-
         var endpoint_list = $('#endpoint-table').datatables_extended({
             serverSide: true,
             processing: true,
             paging: true,
             "ajax": {
-                "url": jagg.url("/site/blocks/endpoint/endpoint-list/ajax/endpoint-list.jag?action=getEndpointsWithPagination"),
+                "url": jagg.site.context + "/site/blocks/endpoint/endpoint-list/ajax/endpoint-list.jag?action=getEndpoints",
                 "dataSrc": function ( json ) {
                     if(json.endpoints.length > 0){
                         $('#endpoint-table-wrap').removeClass("hide");
                     }
                     else{
                         $('#endpoint-table-nodata').removeClass("hide");
+
                     }
                     return json.endpoints
                 }
             },
             "columns": [
-                { "data": "name",
-                    "render": function(data, type, rec, meta){
-                        return  endpoint_name(context);
-                    }
-                },
+                { "data": "name"},
                 { "data": "version" },
-                { "data": "type" }
+                { "data": "description" },
+                { "data": "actions",
+                    "render": function ( data, type, rec, meta ) {
+                        return endpoint_actions(rec);
+                    }
+                }
             ],
         });
 

@@ -34,8 +34,8 @@
 <div class="form-group" id="endpointName">
     <label class="control-label col-sm-3" for="credentials"><%=i18n.localize("Name")%>:<span class="requiredAstrix">*</span></label>
     <div class="col-sm-4">
-        <% if(endpoint != null) { %>
-           <input type="text" class="form-control required validInput" id="epName" name="epName" placeholder="Endpoint Name" value="<%=encode.forHtml(endpoint.getName())%>">
+        <% if(endpoint != null && endpoint.getName() != null) { %>
+           <input type="text" class="form-control required validInput" id="epName" name="epName" placeholder="Endpoint Name" value="<%=encode.forHtml(String(endpoint.getName()))%>">
         <% } else { %>
            <input type="text" class="form-control required validInput" id="epName" name="epName" placeholder="Endpoint Name" value="">
         <% } %>
@@ -45,8 +45,8 @@
 <div class="form-group" id="endpointVersion">
     <label class="control-label col-sm-3" for="version"><%=i18n.localize("Version")%>:<span class="requiredAstrix">*</span></label>
     <div class="col-sm-4">
-        <% if(endpoint != null) { %>
-           <input type="text" class="form-control required validInput" id="epVersion" name="epVersion" placeholder="Endpoint Version" value="<%=encode.forHtml(endpoint.getVersion())%>">
+        <% if(endpoint != null && endpoint.getVersion() != null) { %>
+           <input type="text" class="form-control required validInput" id="epVersion" name="epVersion" placeholder="Endpoint Version" value="<%=encode.forHtml(String(endpoint.getVersion()))%>">
         <% } else { %>
            <input type="text" class="form-control required validInput" id="epVersion" name="epVersion" placeholder="Endpoint Version" value="">
         <% } %>
@@ -56,14 +56,14 @@
 <div class="form-group" id="endpointDescription">
     <label class="control-label col-sm-3" for="description"><%=i18n.localize("Description")%>:</label>
     <div class="col-sm-4">
-        <% if(endpoint != null) { %>
-           <textarea id="epDescriptionText"><%=encode.forHtml(endpoint.getDescription())%></textarea>
+        <% if(endpoint != null && endpoint.getDescription() != null) { %>
+           <textarea id="epDescriptionText"><%=encode.forHtml(String(endpoint.getDescription()))%></textarea>
         <% } else { %>
            <textarea id="epDescriptionText"></textarea>
         <% } %>
     </div>
-    <% if(endpoint != null) { %>
-               <input type="hidden" name="epDescription" id="epDescription" value="<%=encode.forHtml(endpoint.getDescription())%>">
+    <% if(endpoint != null && endpoint.getDescription() != null) { %>
+               <input type="hidden" name="epDescription" id="epDescription" value="<%=encode.forHtml(String(endpoint.getDescription()))%>">
     <% } else { %>
                <input type="hidden" name="epDescription" id="epDescription" value="">
     <% } %>
@@ -72,16 +72,16 @@
 <div class="form-group" id="endpointRoles">
     <label class="control-label col-sm-3" for="type"><%=i18n.localize("Visible Roles")%>:</label>
     <div class="col-sm-4">
-        <% if(endpoint != null) { %>
-           <input type="text" class="form-control validInput" id="epRoles" name="epType" placeholder="Comma Separate Visible Roles" value="<%=encode.forHtml(endpoint.getVisibleRoles())%>">
+        <% if(endpoint != null && endpoint.getVisibleRoles() != null) { %>
+           <input type="text" class="form-control validInput" id="epRoles" name="epRoles" placeholder="Comma Separate Visible Roles" value="<%=encode.forHtml(String(endpoint.getVisibleRoles()))%>">
         <% } else { %>
-           <input type="text" class="form-control validInput" id="epRoles" name="epType" placeholder="Comma Separate Visible Roles" value="">
+           <input type="text" class="form-control validInput" id="epRoles" name="epRoles" placeholder="Comma Separate Visible Roles" value="">
         <% } %>
     </div>
 </div>
 
-<% if(endpoint != null) { %>
-    <input type="hidden" id="epConfig" name="epConfig" value="<%= encode.forHtmlAttribute(endpoint.getEndpointConfig()) %>"/>
+<% if(endpoint != null && endpoint.getEndpointConfig() != null) { %>
+    <input type="hidden" id="epConfig" name="epConfig" value="<%= encode.forHtmlAttribute(String(endpoint.getEndpointConfig())) %>"/>
 <% } else { %>
     <input type="hidden" id="epConfig" name="epConfig" value=""/>
 <% } %>
@@ -144,14 +144,14 @@
 <div class="form-group" id="credentials" <% if(endpointSecured == false) { %> style="display: none;" <% } %>>
     <label class="control-label col-sm-3" for="credentials"><%=i18n.localize("Credentials")%>:<span class="requiredAstrix">*</span></label>
     <div class="col-sm-2">
-        <% if(endpoint != null) { %>
+        <% if(endpoint != null && endpoint.getEndpointUsername() != null) { %>
             <input type="text" class="form-control required validInput" id="epUsername" name="epUsername" placeholder="Username" value="<%=encode.forHtml(endpoint.getEndpointUsername())%>">
         <% } else { %>
             <input type="text" class="form-control required validInput" id="epUsername" name="epUsername" placeholder="Username" value="">
         <% } %>
     </div>
     <div class="col-sm-2">
-        <% if(endpoint != null) { %>
+        <% if(endpoint != null && endpoint.getEndpointPassword() != null) { %>
             <input type="password" class="form-control required" id="epPassword" name="epPassword" placeholder="Password" value="<%=encode.forHtml(endpoint.getEndpointPassword())%>">
         <% } else { %>
             <input type="password" class="form-control required" id="epPassword" name="epPassword" placeholder="Password" value="">

@@ -10,6 +10,7 @@ jagg.block("endpoint/endpoint-edit", {
         var name = request.getParameter("name");
         var endpoint = null;
         if(name != null && name != "") {
+            var provider = jagg.getUser().username;
             var APIProviderImpl = Packages.org.wso2.carbon.apimgt.impl.APIProviderImpl;
             var apiProvider = new APIProviderImpl(provider);
             endpoint = apiProvider.getEndpointByName(String(name));
