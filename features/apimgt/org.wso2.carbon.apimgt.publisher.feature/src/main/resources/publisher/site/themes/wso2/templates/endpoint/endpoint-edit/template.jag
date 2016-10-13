@@ -1,19 +1,20 @@
 <% jagg.template("endpoint/endpoint-edit", function(inputs, outputs, jagg) {
- var APIUtil = org.wso2.carbon.apimgt.impl.utils.APIUtil;
- var endpoint = null;
+ var endpoint = outputs.endpoint;
  var endpointSecured  = false;
 
- if (endpoint == null) {
-
- } else {
-        if (endpoint.isEndpointSecured() == true) {
-           endpointSecured = true;
-        }
+ if (endpoint != null) {
+     if (endpoint.isEndpointSecured() == true) {
+         endpointSecured = true;
+     }
  }
  %>
 
 <div class="page-header" id="Message">
+<% if (endpoint != null) { %>
+    <h2><%=i18n.localize("Edit Endpoint")%></h2>
+<% } else { %>
     <h2><%=i18n.localize("Add Endpoint")%></h2>
+<% } %>
 </div>
 
 <div class="alert alert-success" id="appAddMessage" style="display:none">
@@ -24,11 +25,17 @@
 <div class="white-wrapper add-padding-5x">
 <form class="form-horizontal" id="endpointForm">
 
+<% if (endpoint != null) { %>
+<input type="hidden" name="action" id="add" value="updateEndpoint">
+<% } else { %>
+<input type="hidden" name="action" id="add" value="addEndpoint">
+<% } %>
+
 <div class="form-group" id="endpointName">
     <label class="control-label col-sm-3" for="credentials"><%=i18n.localize("Name")%>:<span class="requiredAstrix">*</span></label>
     <div class="col-sm-4">
         <% if(endpoint != null) { %>
-           <input type="text" class="form-control required validInput" id="epName" name="epName" placeholder="Endpoint Name" value="">
+           <input type="text" class="form-control required validInput" id="epName" name="epName" placeholder="Endpoint Name" value="<%=encode.forHtml(endpoint.getName())%>">
         <% } else { %>
            <input type="text" class="form-control required validInput" id="epName" name="epName" placeholder="Endpoint Name" value="">
         <% } %>
@@ -39,7 +46,7 @@
     <label class="control-label col-sm-3" for="version"><%=i18n.localize("Version")%>:<span class="requiredAstrix">*</span></label>
     <div class="col-sm-4">
         <% if(endpoint != null) { %>
-           <input type="text" class="form-control required validInput" id="epVersion" name="epVersion" placeholder="Endpoint Version" value="">
+           <input type="text" class="form-control required validInput" id="epVersion" name="epVersion" placeholder="Endpoint Version" value="<%=encode.forHtml(endpoint.getVersion())%>">
         <% } else { %>
            <input type="text" class="form-control required validInput" id="epVersion" name="epVersion" placeholder="Endpoint Version" value="">
         <% } %>
@@ -50,26 +57,34 @@
     <label class="control-label col-sm-3" for="description"><%=i18n.localize("Description")%>:</label>
     <div class="col-sm-4">
         <% if(endpoint != null) { %>
-           <textarea id="epDescription"></textarea>
+           <textarea id="epDescriptionText"><%=encode.forHtml(endpoint.getDescription())%></textarea>
         <% } else { %>
-           <textarea id="epDescription"></textarea>
+           <textarea id="epDescriptionText"></textarea>
         <% } %>
     </div>
+    <% if(endpoint != null) { %>
+               <input type="hidden" name="epDescription" id="epDescription" value="<%=encode.forHtml(endpoint.getDescription())%>">
+    <% } else { %>
+               <input type="hidden" name="epDescription" id="epDescription" value="">
+    <% } %>
 </div>
 
 <div class="form-group" id="endpointRoles">
     <label class="control-label col-sm-3" for="type"><%=i18n.localize("Visible Roles")%>:</label>
     <div class="col-sm-4">
         <% if(endpoint != null) { %>
-           <input type="text" class="form-control validInput" id="epRoles" name="epType" placeholder="Comma Separate Visible Roles" value="">
+           <input type="text" class="form-control validInput" id="epRoles" name="epType" placeholder="Comma Separate Visible Roles" value="<%=encode.forHtml(endpoint.getVisibleRoles())%>">
         <% } else { %>
            <input type="text" class="form-control validInput" id="epRoles" name="epType" placeholder="Comma Separate Visible Roles" value="">
         <% } %>
     </div>
 </div>
 
-<input type="hidden" id="epConfig" name="epConfig" value="<%= encode.forHtmlAttribute("") %>"/>
-
+<% if(endpoint != null) { %>
+    <input type="hidden" id="epConfig" name="epConfig" value="<%= encode.forHtmlAttribute(endpoint.getEndpointConfig()) %>"/>
+<% } else { %>
+    <input type="hidden" id="epConfig" name="epConfig" value=""/>
+<% } %>
 <div id="endpoint_help" class="hide">
      <strong>HTTP/REST Endpoint </strong><p><%= i18n.localize("A REST API endpoint based on a URI template")%></p>
      <strong>HTTP/SOAP Endpoint</strong><p><%= i18n.localize("The direct URL of the service")%></p>
@@ -89,17 +104,16 @@
     <div class="col-sm-4">
     <% if(endpoint != null) { %>
        <select class="select required form-control" id="endpointType" name="endpointType" onchange="showHideEndpointDivs()">
-           <option value="nonsecured" <%if(false =="false"){%> selected="selected" <%}%>><%=i18n.localize("Non Secured")%></option>
-           <option value="secured" <%if(true =="true"){%> selected="selected" <%}%>><%=i18n.localize("Secured")%></option>
+           <option value="nonsecured" <%if(!endpoint.isEndpointSecured()){%> selected="selected" <%}%>><%=i18n.localize("Non Secured")%></option>
+           <option value="secured" <%if(endpoint.isEndpointSecured()){%> selected="selected" <%}%>><%=i18n.localize("Secured")%></option>
        </select>
     <% } else { %>
-        <select class="select required form-control" id="endpointType" name="endpointType" onchange="showHideEndpointDivs()">
+        <select class="select required form-control" id="epSecurity" name="epSecurity" onchange="showHideEndpointDivs()">
            <option value="nonsecured" selected="selected"><%=i18n.localize("Non Secured")%></option>
            <option value="secured"><%=i18n.localize("Secured")%></option>
        </select>
     <% } %>
     </div>
-    <input type="hidden" id="epSecurity" name="epSecurity" value="">
 </div>
 
 <div class="form-group" id="endpointAuthType" <% if(endpointSecured == false) { %> style="display: none;" <% } %>>
@@ -113,21 +127,35 @@
         <p id="endpointAuth_help" class="hide"><%=i18n.localize("Select the authentication scheme you require.")%></p>
     </label>
     <div class="col-sm-4">
+        <% if(endpoint != null) { %>
         <select class="select required form-control" id="epAuthType" name="epAuthType" >
-            <option value="basicAuth" <%if( true=="false"){%> selected="selected" <%}%>><%=i18n.localize("Basic Auth")%></option>
-            <option value="digestAuth" <%if(true=="true"){%> selected="selected" <%}%>><%=i18n.localize("Digest Auth")%></option>
+            <option value="basicAuth" <%if("basicAuth" == endpoint.getAuthType()){%> selected="selected" <%}%>><%=i18n.localize("Basic Auth")%></option>
+            <option value="digestAuth" <%if("digestAuth" == endpoint.getAuthType()){%> selected="selected" <%}%>><%=i18n.localize("Digest Auth")%></option>
         </select>
+        <% } else { %>
+         <select class="select required form-control" id="epAuthType" name="epAuthType" >
+            <option value="basicAuth" selected="selected"><%=i18n.localize("Basic Auth")%></option>
+            <option value="digestAuth"><%=i18n.localize("Digest Auth")%></option>
+        </select>
+        <% } %>
     </div>
-    <input type="hidden" id="epAuthType" name="epAuthType" value="">
 </div>
 
 <div class="form-group" id="credentials" <% if(endpointSecured == false) { %> style="display: none;" <% } %>>
     <label class="control-label col-sm-3" for="credentials"><%=i18n.localize("Credentials")%>:<span class="requiredAstrix">*</span></label>
     <div class="col-sm-2">
-        <input type="text" class="form-control required validInput" id="epUsername" name="epUsername" placeholder="Username" value="">
+        <% if(endpoint != null) { %>
+            <input type="text" class="form-control required validInput" id="epUsername" name="epUsername" placeholder="Username" value="<%=encode.forHtml(endpoint.getEndpointUsername())%>">
+        <% } else { %>
+            <input type="text" class="form-control required validInput" id="epUsername" name="epUsername" placeholder="Username" value="">
+        <% } %>
     </div>
     <div class="col-sm-2">
-        <input type="password" class="form-control required" id="epPassword" name="epPassword" placeholder="Password" value="">
+        <% if(endpoint != null) { %>
+            <input type="password" class="form-control required" id="epPassword" name="epPassword" placeholder="Password" value="<%=encode.forHtml(endpoint.getEndpointPassword())%>">
+        <% } else { %>
+            <input type="password" class="form-control required" id="epPassword" name="epPassword" placeholder="Password" value="">
+        <% } %>
     </div>
 </div>
 

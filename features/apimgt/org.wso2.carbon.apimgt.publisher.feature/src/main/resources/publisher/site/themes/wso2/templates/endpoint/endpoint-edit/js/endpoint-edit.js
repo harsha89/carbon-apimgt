@@ -34,11 +34,23 @@ $(document).ready(function () {
         var epVersion = $("#epVersion").val();
         var epConfig = $('#epConfig').val(JSON.stringify($("#endpoint-ui").data("plugin_apimEndpointUi").get_endpoint_config()));
         var epRoles = $("#epRoles").val();
-        var epDescription = $("#epDescription").val();
+        var epDescription = $("#epDescriptionText").val();
+        $("#epDescription").val(epDescription);
         var epSecurity = $("#epSecurity").val();
         var epAuthType = $("#epAuthType").val();
         var epUsername = $("#epUsername").val();
         var epPassword = $("#epPassword").val();
+        var action = $("#action").val();
+        var successMesssage;
+        var failureMesssage;
+
+        if(action == "addEndpoint") {
+            successMesssage = "Endpoint Successfully Added";
+            failureMesssage = "Failed to add endpoint";
+        } else {
+            successMesssage = "Endpoint Successfully Updated";
+            failureMesssage = "Failed to update the endpoint"
+        }
 
         $.ajax({
             type: "POST",
@@ -46,24 +58,24 @@ $(document).ready(function () {
             data: $("#endpointForm").serialize(), // serializes the form's elements.
             success: function(data)
             {
-                alert(data); // show response from the php script.
+                jagg.message({
+                    content: i18n.t(successMesssage),
+                    type: 'confirm',
+                    okCallback: function () {
+                        location.href = 'site/pages/endpoints.jag';
+                    },
+                    cancelCallback: function () {
+                        location.href = 'site/pages/endpoints.jag';
+                    }
+                });
+            },
+            error: function(data) {
+                jagg.message({
+                    content: i18n.t(failureMesssage),
+                    type: 'confirm'
+                });
             }
         });
-
-       /* jagg.post("/site/blocks/endpoint/endpoint-edit/ajax/endpoint-edit.jag", {
-            action: "addEndpoint",
-            epName: epName,
-            epVersion: epVersion,
-            epConfig: epConfig,
-            epRoles: epRoles,
-            epDescription: epDescription,
-            epSecurity: epSecurity,
-            epAuthType: epAuthType,
-            epUsername: epUsername,
-            epPassword: epPassword
-        }, function (result) {
-            window.location =  jagg.url("/site/pages/endpoints.jag" );
-        }, "json");*/
     };
 });
 
