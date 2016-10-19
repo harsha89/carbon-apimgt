@@ -118,7 +118,12 @@ import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.registry.indexing.indexer.IndexerException;
 import org.wso2.carbon.registry.indexing.solr.SolrClient;
 import org.wso2.carbon.user.api.*;
-import org.wso2.carbon.user.core.UserCoreConstants;
+import org.wso2.carbon.user.api.AuthorizationManager;
+import org.wso2.carbon.user.api.Permission;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.core.*;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.config.RealmConfigXMLProcessor;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -6263,5 +6268,25 @@ public final class APIUtil {
     public static String getAnalyticsServerPassword() {
         return ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIAnalyticsConfiguration().
                 getDasReceiverServerPassword();
+    }
+
+    public static boolean isUserAuthorizedToViewEndpoints(String username, String[] availableRoles) throws APIManagementException {
+        String[] userRoles = getListOfRoles(username);
+        String adminRoleName = "";
+        try {
+            adminRoleName = ServiceReferenceHolder.getUserRealm().getRealmConfiguration().getAdminRoleName();
+        } catch (org.wso2.carbon.user.core.UserStoreException e) {
+            String msg = "Error while obtaining admin role name";
+            log.error(msg + e.getMessage(), e);
+            handleException(msg, e);
+        }
+        for(String userRole : userRoles) {
+            for(String role : availableRoles) {
+                if(userRole.equals(role) || adminRoleName.equals(userRole)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

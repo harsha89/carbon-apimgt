@@ -1253,4 +1253,10 @@ public final class APIConstants {
     public static final String ENDPOINT_UUID = "UUID";
     public static final String ENDPOINT_TENANT_ID = "TENANT_ID";
     public static final String ENDPOINT_TOTAL = "TOTAL";
+    public static final String COMMA = ",";
+    public static final String ENDPOINT_TYPE = "endpoint_type";
+    public static final String PRODUCTION_ENDPOINTS = "production_endpoints";
+    public static final String SANDBOX_ENDPOINTS = "sandbox_endpoints";
+    public static final String DEFINED = "defined";
+    public static final String URL = "url";
 }

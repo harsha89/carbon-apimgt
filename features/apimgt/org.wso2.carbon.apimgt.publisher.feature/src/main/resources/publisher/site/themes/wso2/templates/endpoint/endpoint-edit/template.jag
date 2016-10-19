@@ -35,7 +35,7 @@
     <label class="control-label col-sm-3" for="credentials"><%=i18n.localize("Name")%>:<span class="requiredAstrix">*</span></label>
     <div class="col-sm-4">
         <% if(endpoint != null && endpoint.getName() != null) { %>
-           <input type="text" class="form-control required validInput" id="epName" name="epName" placeholder="Endpoint Name" value="<%=encode.forHtml(String(endpoint.getName()))%>">
+           <input type="text" readonly class="form-control required validInput" id="epName" name="epName" placeholder="Endpoint Name" value="<%=encode.forHtml(String(endpoint.getName()))%>">
         <% } else { %>
            <input type="text" class="form-control required validInput" id="epName" name="epName" placeholder="Endpoint Name" value="">
         <% } %>
@@ -46,7 +46,7 @@
     <label class="control-label col-sm-3" for="version"><%=i18n.localize("Version")%>:<span class="requiredAstrix">*</span></label>
     <div class="col-sm-4">
         <% if(endpoint != null && endpoint.getVersion() != null) { %>
-           <input type="text" class="form-control required validInput" id="epVersion" name="epVersion" placeholder="Endpoint Version" value="<%=encode.forHtml(String(endpoint.getVersion()))%>">
+           <input type="text" readonly class="form-control required validInput" id="epVersion" name="epVersion" placeholder="Endpoint Version" value="<%=encode.forHtml(String(endpoint.getVersion()))%>">
         <% } else { %>
            <input type="text" class="form-control required validInput" id="epVersion" name="epVersion" placeholder="Endpoint Version" value="">
         <% } %>

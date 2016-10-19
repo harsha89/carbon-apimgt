@@ -62,6 +62,12 @@
         this.options = $.extend( {}, defaults, options) ;
 
         this.config = {"production_endpoints": {"url": "","config": null},"sandbox_endpoints": {"url": "","config": null},"endpoint_type": "http" };
+        var endpointString = $('#endpoint_list').val();
+        var endpointList = null;
+        if(endpointString != null && endpointList != "") {
+            endpointList = endpointString.split(',');
+        }
+        this.config.endpointList = endpointList;
         if(this.options.config != undefined && this.options.config != "")
             this.config = $.extend( {}, this.config, this.options.config);
 
@@ -89,6 +95,7 @@
         attach_events: function(){
             this.element
             .on("change","#endpoint_type", $.proxy(this._on_endpoint_changed, this))
+            .on("change",".defined_endpoints_config", $.proxy(this._on_defined_endpoint_changed, this))
             .on("change","#failover", $.proxy(this._on_failover_checked, this))
             .on("change","#load_balance", $.proxy(this._on_load_balance_checked, this))
             .on("click",".add_ep", $.proxy(this._on_add_ep, this))
@@ -124,10 +131,33 @@
             if(this.config.endpoint_type == "default"){
                 this.config.production_endpoints = [{"url":"default"}];
                 this.config.sandbox_endpoints = [{"url":"default"}];
+                $('#show-more-options').show();
+            } else if(this.config.endpoint_type == "defined"){
+                var sandboxEndpointName = $("#sandbox_endpoints_combo").val();
+                var productionEndpointName = $("#production_endpoints_combo").val();
+                this.config.production_endpoints = [{"url":sandboxEndpointName}];
+                this.config.sandbox_endpoints = [{"url":productionEndpointName}];
+                $('#show-more-options').hide();
             }else{
                 this.config.production_endpoints = [{"url":"", endpoint_type:this._get_selected_ep() }];
                 this.config.sandbox_endpoints = [{"url":"", endpoint_type:this._get_selected_ep() }];
+                $('#show-more-options').show();
             }
+            delete this.config.failOver;
+            delete this.config.algoCombo ;
+            delete this.config.algoClassName ;
+            delete this.config.sessionManagement ;
+            delete this.config.sessionTimeOut ;
+            delete this.config.production_failovers;
+            delete this.config.sandbox_failovers;
+            this.render();
+        },
+
+        _on_defined_endpoint_changed : function(e){
+            var sandboxEndpointName = $("#sandbox_endpoints_combo").val();
+            var productionEndpointName = $("#production_endpoints_combo").val();
+            this.config.production_endpoints = [{"url":productionEndpointName}];
+            this.config.sandbox_endpoints = [{"url":sandboxEndpointName}];
             delete this.config.failOver;
             delete this.config.algoCombo ;
             delete this.config.algoClassName ;

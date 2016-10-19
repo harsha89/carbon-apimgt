@@ -1,6 +1,7 @@
 <% jagg.template("item-implement", function(inputs, outputs, jagg) { %>
 <% 
     var api = outputs.api;
+    var endpointList = outputs.endpointsList;
     var permitted=outputs.isPermitted;
     var isCreatePermitted=outputs.isCreatePermitted;
     var mod = jagg.module("api");
@@ -157,6 +158,32 @@
 															</div>
 							                            </div>
 							                            {{/inline}}
+
+							                            {{#*inline "definedEndpoint"}}
+								                        <div class="form-group">
+								                            <label class="control-label col-xs-12 col-sm-3 col-md-3 col-lg-3" for="endpoint_type">{{#if name}}{{#if @first}}{{ name }} :<span class="requiredAstrix">*</span>
+								                            	<a class="help_popup" help_data="" data-trigger="hover" data-placement="bottom" title="endpoint_help">
+								                            		<span class="icon fw-stack fw-lg" style="font-size:6px">
+													                   <i class="fw fw-circle fw-stack-2x"></i>
+													                   <i class="fw fw-question fw-stack-1x fw-inverse" style="font-size:8px"></i>
+													                </span>
+								                            	</a>{{/if}}{{/if}}
+								                            </label>
+								                            <div class=" col-xs-12 col-sm-8 col-md-8 col-lg-8">
+																<div class="input-group">
+																  {{#if label }}
+																  <span class="input-group-addon">{{ label }}</span>
+																  {{/if}}
+																  <select class="form-control valid defined_endpoints_config" name="{{type}}" id="{{type}}" aria-invalid="false">
+																    {{#each endpointList}}
+															            <option {{#ifCond ../url "==" this}}selected="selected"{{/ifCond}} value="{{this}}">{{this}}</option>
+															        {{/each}}
+															       </select>
+																</div>
+															</div>
+							                            </div>
+							                            {{/inline}}
+
 								                        <div class="form-group">
 								                            <label class="control-label col-xs-12 col-sm-3 col-md-3 col-lg-3" for="endpoint_type">Endpoint Type :<span class="requiredAstrix">*</span>
 								                            	<a class="help_popup" help_data="endpoint_help" data-trigger="hover" data-placement="bottom" title="endpoint_help">
@@ -171,6 +198,7 @@
 							                                        <option value="http"  {{#if http }}selected="selected"{{/if}}>HTTP/REST Endpoint</option>
 							                                        <option value="address" {{#if address }}selected="selected"{{/if}}>HTTP/SOAP Endpoint</option>
 							                                        <option value="default" {{#if default }}selected="selected"{{/if}}>Dynamic Endpoint</option>
+							                                        <option value="defined" {{#if defined }}selected="selected"{{/if}}>Defined Endpoint</option>
 							                                    </select>
 							                                </div>
 							                            </div>
@@ -184,6 +212,15 @@
 															</div>
 															</div>
 														</div>
+							                            {{else}}
+							                            {{#if defined}}
+							                                {{#each production_endpoints}}
+                                                                    {{> definedEndpoint this name="Production Endpoint" type="production_endpoints_combo" endpointList=../endpointList}}
+							                                {{/each}}
+
+							                                {{#each sandbox_endpoints}}
+                                                                    {{> definedEndpoint this name="Sandbox Endpoint" type="sandbox_endpoints_combo" endpointList=../endpointList}}
+							                                {{/each}}
 							                            {{else}}
 							                            <div class="form-group">    
 								                            <label class="control-label col-xs-12 col-sm-3 col-md-3 col-lg-3">
@@ -246,7 +283,7 @@
 							                            	{{> add_remove_ep ep_type="sandbox_failovers" }}
 							                            {{/if}}	
 							                            {{/if}}	
-
+                                                        {{/if}}
 							                            {{#if load_balance}}
 															<div class="form-group">
 															    <label class="control-label col-xs-12 col-sm-3
@@ -321,23 +358,24 @@
 													</script>
 							
 							                        <input type="hidden" id="endpoint_config" name="endpoint_config" value="<%= encode.forHtmlAttribute(api.endpointConfig) %>"/>
-							
+							                        <input type="hidden" id="endpoint_list" name="endpoint_list" value="<%= encode.forHtmlAttribute(endpointList) %>"/>
+
 							                        <div id="endpoint_help" class="hide">
 								                         <strong>HTTP/REST Endpoint </strong><p><%= i18n.localize("A REST API endpoint based on a URI template")%></p>
 								                         <strong>HTTP/SOAP Endpoint</strong><p><%= i18n.localize("The direct URL of the service")%></p>
 								                         <!-- strong>Failover Group </strong><p><%= i18n.localize("The endpoints that the service tries to connect to in case of a failure. This happens in a round robin manner.")%></p>
 								                         <strong>Load Balance</strong><p><%= i18n.localize("The endpoints where the incoming requests are directed to in a round robin manner. They automatically handle fail-over as well.")%></p-->
 								                         <Strong>Dynamic Endpoint</strong><p><%= i18n.localize("The dynamic endpoint will send the message to the address specified in the 'To' header.")%></p>
-							                        </div>							
-							
-							                         <div class="form-group">
+								                         <Strong>Defined Endpoint</strong><p><%= i18n.localize("The defined endpoint will allow to select already defined endpoints in the system.")%></p>
+							                        </div>
+							                         <div class="form-group" id="show-more-options" style="display: block">
 							                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 col-sm-offset-3 col-md-offset-3 col-lg-offset-3">
 							                                <a href="#" class="more-options but" ref="more-options-endpoints" title="<%=i18n.localize("Show More Options")%>" ><%=i18n.localize("Show More Options")%></a>
 							                             </div>
 							                         </div>
 							                        <div id="more-options-endpoints"  style="display:none">
 							
-							
+
 							                        <div class="form-group">
 							                            <label class="control-label col-sm-3" for="endpointType"><%=i18n.localize("Endpoint Security Scheme")%>:<span class="requiredAstrix">*</span>
 							                      			<a class="help_popup" help_data="endpointSec_help" data-trigger="hover"  data-placement="bottom" title="endpointSec_help">
@@ -554,6 +592,7 @@
 								
 								                <fieldset class="implementation_method_endpoint implementation_method <%= hide_endpoint %>">
 								                    <input type="hidden" class="prototype_config form-control" name="endpoint_config" value="<%= encode.forHtmlAttribute(api.endpointConfig) %>"/>
+								                    <input type="hidden" class="prototype_config form-control" name="available_endpoints" value="<%= encode.forHtmlAttribute(api.endpointConfig) %>"/>
 								                    <div class="form-group">
 								                        <label class="control-label col-sm-3"><%=i18n.localize("Prototype Endpoint:")%>
 								                        <a class="help_popup" help_data="endpoint_test_help" data-trigger="hover" title="endpoint_test_help">

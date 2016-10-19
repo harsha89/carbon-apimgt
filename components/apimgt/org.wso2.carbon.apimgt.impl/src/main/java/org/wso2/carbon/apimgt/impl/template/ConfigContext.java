@@ -35,4 +35,9 @@ public abstract class ConfigContext {
         log.error(msg);
         throw new APITemplateException(msg);
     }
+
+    protected void handleException(String msg, Exception e) throws APITemplateException {
+        log.error(msg);
+        throw new APITemplateException(msg, e);
+    }
 }

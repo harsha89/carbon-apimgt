@@ -22,6 +22,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.API;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 
 /**
  * Set endpoint config in context
@@ -48,8 +49,11 @@ public class EndpointConfigContext extends ConfigContextDecorator {
             try {
                 Object config = parser.parse(config_json);
                 this.endpoint_config = (JSONObject) config;
+                if(APIConstants.DEFINED.equalsIgnoreCase(api.getEndpointType())) {
+
+                }
             } catch (ParseException e) {
-                this.handleException("Unable to pass the endpoint JSON config");
+                this.handleException("Unable to pass the endpoint JSON config", e);
             }
         }
     }
@@ -58,7 +62,7 @@ public class EndpointConfigContext extends ConfigContextDecorator {
         VelocityContext context = super.getContext();
 
         context.put("endpoint_config", this.endpoint_config);
-
+        context.put("definedEndpoint", this.api.getEndpointType()); 
         return context;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

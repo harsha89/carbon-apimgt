@@ -52,17 +52,38 @@ if (jagg.isCSRFTokenValid())
                 };
                 print(obj);
             } else if (action === "updateEndpoint" && request.getMethod() == 'POST') {
-
-                if (result.error) {
-                    obj = {
-                        error: result.error,
-                        message: result.message
-                    };
+                var endpointName = request.getParameter("epName");
+                var endpointVersion = request.getParameter("epVersion");
+                var endpointConfig = request.getParameter("epConfig");
+                var endpointVisibleRoles = request.getParameter("epRoles");
+                var endpointDescription = request.getParameter("epDescription");
+                var endpointSecurity = request.getParameter("epSecurity");
+                var endpointAuthType = request.getParameter("epAuthType");
+                var endpointUsername = request.getParameter("epUsername");
+                var endpointPassword = request.getParameter("epPassword");
+                var provider = jagg.getUser().username;
+                var Endpoint = Packages.org.wso2.carbon.apimgt.api.model.Endpoint;
+                var endpoint = new Endpoint();
+                endpoint.setName(String(endpointName));
+                endpoint.setDescription(String(endpointDescription));
+                if(endpointSecurity == "secured") {
+                    endpoint.setEndpointSecured(true);
+                    endpoint.setAuthType(String(endpointAuthType));
+                    endpoint.setEndpointPassword(String(endpointPassword));
+                    endpoint.setEndpointUsername(String(endpointUsername));
                 } else {
-                    obj = {
-                        error: false
-                    }
+                    endpoint.setEndpointSecured(false);
                 }
+                endpoint.setEndpointConfig(String(endpointConfig));
+                endpoint.setVisibleRoles(String(endpointVisibleRoles));
+                endpoint.setVersion(String(endpointVersion));
+                endpoint.setUpdater(provider);
+                var APIProviderImpl = Packages.org.wso2.carbon.apimgt.impl.APIProviderImpl;
+                var apiProvider = new APIProviderImpl(provider);
+                apiProvider.updateEndpoint(endpoint);
+                obj = {
+                    error: false
+                };
                 print(obj);
 
             }  else {

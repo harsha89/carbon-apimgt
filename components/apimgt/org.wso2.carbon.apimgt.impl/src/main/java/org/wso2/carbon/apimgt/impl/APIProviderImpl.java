@@ -87,7 +87,6 @@ import org.wso2.carbon.apimgt.impl.utils.APINameComparator;
 import org.wso2.carbon.apimgt.impl.utils.APIStoreNameComparator;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionComparator;
-import org.wso2.carbon.apimgt.impl.utils.EndpointNameComparator;
 import org.wso2.carbon.apimgt.impl.utils.StatUpdateClusterMessage;
 import org.wso2.carbon.apimgt.statsupdate.stub.GatewayStatsUpdateServiceAPIManagementExceptionException;
 import org.wso2.carbon.apimgt.statsupdate.stub.GatewayStatsUpdateServiceClusteringFaultException;
@@ -1498,6 +1497,39 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
 
         try{
+            //Check the endpoint config whether it's defined endpoint or not
+            JSONParser parser = new JSONParser();
+            String configJson = api.getEndpointConfig();
+            if(StringUtils.isEmpty(configJson)) {
+                Object config = parser.parse(configJson);
+                JSONObject endpointObject = (JSONObject) config;
+                Object endpointTypeOb = endpointObject.get(APIConstants.ENDPOINT_TYPE);
+                String endpointType = endpointTypeOb.toString();
+                if(APIConstants.DEFINED.equalsIgnoreCase(endpointType)) {
+                    JSONObject productionEndpointElement = (JSONObject) endpointObject.get(APIConstants.PRODUCTION_ENDPOINTS);
+                    JSONObject sandboxEndpoinElement = (JSONObject) endpointObject.get(APIConstants.SANDBOX_ENDPOINTS);
+                    if(productionEndpointElement != null) {
+                        Object productionEndpointOb = productionEndpointElement.get(APIConstants.URL);
+                        if(productionEndpointOb != null) {
+                            String productionEndpointName = productionEndpointOb.toString();
+                            Endpoint productionEndpoint = getEndpointByName(productionEndpointName);
+                            api.setProductionEndpoint(productionEndpoint);
+                        }
+
+                    }
+
+                    if(sandboxEndpoinElement != null) {
+                            Object sandboxEndpointOb = productionEndpointElement.get(APIConstants.URL);
+                            if(sandboxEndpointOb != null) {
+                                String sandboxEndpointName = sandboxEndpointOb.toString();
+                                Endpoint sandboxEndpoint = getEndpointByName(sandboxEndpointName);
+                                api.setProductionEndpoint(sandboxEndpoint);
+                            }
+                    }
+
+                    api.setEndpointType(APIConstants.DEFINED);
+                }
+            }
             builder = getAPITemplateBuilder(api);
         }catch(Exception e){
             handleException("Error while publishing to Gateway ", e);
@@ -4610,42 +4642,138 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @see @APIProvider#updateEndpoint
      */
     public void updateEndpoint(Endpoint endpoint) throws APIManagementException {
-        apiMgtDAO.updateEndpoint(endpoint, tenantId);
+        Endpoint existingEndpoint = apiMgtDAO.getEndpointByName(endpoint.getName(), tenantId);
+        if(existingEndpoint != null) {
+            String visibleRoles = existingEndpoint.getVisibleRoles();
+            if (!StringUtils.isEmpty(visibleRoles)) {
+                String[] visibleRolesList = visibleRoles.split(APIConstants.COMMA);
+                boolean isAuthorize = APIUtil.isUserAuthorizedToViewEndpoints(this.username, visibleRolesList);
+                if (isAuthorize) {
+                    apiMgtDAO.updateEndpoint(endpoint, tenantId);
+                } else {
+                    throw new APIManagementException("User doesn't have required permission for update endpoint "
+                                                                                                    + endpoint.getName());
+                }
+            } else {
+                apiMgtDAO.updateEndpoint(endpoint, tenantId);
+            }
+        } else {
+            throw new APIManagementException("No previous endpoint exist in given name" + endpoint.getName());
+        }
     }
 
     /**
      * @see @APIProvider#deleteEndpointByName
      */
     public void deleteEndpointByName(String endpointName) throws APIManagementException {
-        apiMgtDAO.deleteEndpointByName(endpointName, tenantId);
+        Endpoint existingEndpoint = apiMgtDAO.getEndpointByName(endpointName, tenantId);
+        if(existingEndpoint != null) {
+            String visibleRoles = existingEndpoint.getVisibleRoles();
+            if (!StringUtils.isEmpty(visibleRoles)) {
+                String[] visibleRolesList = visibleRoles.split(APIConstants.COMMA);
+                boolean isAuthorize = APIUtil.isUserAuthorizedToViewEndpoints(this.username, visibleRolesList);
+                if (isAuthorize) {
+                    apiMgtDAO.deleteEndpointByName(endpointName, tenantId);
+                } else {
+                    throw new APIManagementException("User doesn't have required permission for delete endpoint "
+                            + endpointName);
+                }
+            } else {
+                apiMgtDAO.deleteEndpointByName(endpointName, tenantId);
+            }
+        } else {
+            throw new APIManagementException("No previous endpoint exist in given name" + endpointName);
+        }
     }
 
     /**
      * @see @APIProvider#deleteEndpointByUuid
      */
     public void deleteEndpointByUuid(String uuid) throws APIManagementException {
-        apiMgtDAO.deleteEndpointByUuid(uuid);
+        Endpoint existingEndpoint = apiMgtDAO.getEndpointByName(uuid, tenantId);
+        if(existingEndpoint != null) {
+            String visibleRoles = existingEndpoint.getVisibleRoles();
+            if (!StringUtils.isEmpty(visibleRoles)) {
+                String[] visibleRolesList = visibleRoles.split(APIConstants.COMMA);
+                boolean isAuthorize = APIUtil.isUserAuthorizedToViewEndpoints(this.username, visibleRolesList);
+                if (isAuthorize) {
+                    apiMgtDAO.deleteEndpointByName(uuid, tenantId);
+                } else {
+                    throw new APIManagementException("User doesn't have required permission for delete endpoint "
+                                                                                                                + uuid);
+                }
+            } else {
+                apiMgtDAO.deleteEndpointByUuid(uuid);
+            }
+        } else {
+            throw new APIManagementException("No previous endpoint exist in given uuid " + uuid);
+        }
     }
 
     /**
      * @see @APIProvider#getEndpoints
      */
     public List<Endpoint> getEndpoints() throws APIManagementException {
-        return apiMgtDAO.getEndpoints(tenantId);
+        List<Endpoint> endpoints =  apiMgtDAO.getEndpoints(tenantId);
+        List<Endpoint> authorizedEndpoints = new ArrayList<Endpoint>();
+        String visibleRoles;
+        for(Endpoint endpoint : endpoints) {
+            visibleRoles = endpoint.getVisibleRoles();
+            if (!StringUtils.isEmpty(visibleRoles)) {
+                String[] visibleRolesList = visibleRoles.split(APIConstants.COMMA);
+                boolean isAuthorize = APIUtil.isUserAuthorizedToViewEndpoints(this.username, visibleRolesList);
+                if (isAuthorize) {
+                    authorizedEndpoints.add(endpoint);
+                }
+            } else {
+                authorizedEndpoints.add(endpoint);
+            }
+        }
+        return authorizedEndpoints;
     }
 
     /**
      * @see @APIProvider#getEndpointByName
      */
     public Endpoint getEndpointByName(String endPointName) throws APIManagementException {
-        return apiMgtDAO.getEndpointByName(endPointName, tenantId);
+        Endpoint endpoint = apiMgtDAO.getEndpointByName(endPointName, tenantId);
+        if(endpoint != null) {
+            String visibleRoles = endpoint.getVisibleRoles();
+            if (!StringUtils.isEmpty(visibleRoles)) {
+                String[] visibleRolesList = visibleRoles.split(APIConstants.COMMA);
+                boolean isAuthorize = APIUtil.isUserAuthorizedToViewEndpoints(this.username, visibleRolesList);
+                if (isAuthorize) {
+                    return endpoint;
+                } else {
+                    throw new APIManagementException("User doesn't has necessary permissions to view the endpoint " + endPointName);
+                }
+            } else {
+                return endpoint;
+            }
+        }
+        return null;
     }
 
     /**
      * @see @APIProvider#getEndpointByUuid
      */
     public Endpoint getEndpointByUuid(String uuid) throws APIManagementException {
-        return apiMgtDAO.getEndpointByUuid(uuid);
+        Endpoint endpoint =  apiMgtDAO.getEndpointByUuid(uuid);
+        if(endpoint != null) {
+            String visibleRoles = endpoint.getVisibleRoles();
+            if (!StringUtils.isEmpty(visibleRoles)) {
+                String[] visibleRolesList = visibleRoles.split(APIConstants.COMMA);
+                boolean isAuthorize = APIUtil.isUserAuthorizedToViewEndpoints(this.username, visibleRolesList);
+                if (isAuthorize) {
+                    return endpoint;
+                } else {
+                    throw new APIManagementException("User doesn't has necessary permissions to view the endpoint " + uuid);
+                }
+            } else {
+                return endpoint;
+            }
+        }
+        return null;
     }
 
     /**

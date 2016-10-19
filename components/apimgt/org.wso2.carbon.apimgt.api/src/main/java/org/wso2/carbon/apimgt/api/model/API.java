@@ -103,6 +103,10 @@ public class API implements Serializable{
 
     private Set<Scope> scopes;
 
+    private Endpoint productionEndpoint;
+    private Endpoint sandboxEndpoint;
+    private String endpointType = null;
+
     private boolean isDefaultVersion = false;
     private boolean isPublishedDefaultVersion=false;
 
@@ -651,6 +655,28 @@ public class API implements Serializable{
     public void setApiLevelPolicy(String apiLevelPolicy) {
         this.apiLevelPolicy = apiLevelPolicy;
     }
-    
-    
+
+    public Endpoint getProductionEndpoint() {
+        return productionEndpoint;
+    }
+
+    public void setProductionEndpoint(Endpoint productionEndpoint) {
+        this.productionEndpoint = productionEndpoint;
+    }
+
+    public Endpoint getSandboxEndpoint() {
+        return sandboxEndpoint;
+    }
+
+    public void setSandboxEndpoint(Endpoint sandboxEndpoint) {
+        this.sandboxEndpoint = sandboxEndpoint;
+    }
+
+    public String getEndpointType() {
+        return endpointType;
+    }
+
+    public void setEndpointType(String endpointType) {
+        this.endpointType = endpointType;
+    }
 }

@@ -529,6 +529,7 @@
     "Add New Endpoint": "Add New Endpoint",
     "Add Endpoint": "Add Endpoint",
     "Edit Endpoint": "Edit Endpoint",
+    "The defined endpoint will allow to select already defined endpoints in the system." : "The defined endpoint will allow to select already defined endpoints in the system.",
     "Please specify a endpoint url" : "Please specify a endpoint url",
     "Endpoint definition represent the details of a backend of a API": "Endpoint definition represent the details of a backend of a API",
     "No endpoints defined yet. Click Add endpoint in the action bar to add an endpoint.": "No endpoints defined yet. Click Add endpoint in the action bar to add an endpoint."

@@ -6,7 +6,20 @@ jagg.block("item-implement", {
 
     getOutputs:function (inputs) {
         var name, version, api, result, mod,isPermitted,isCreatePermitted,tenant;
-
+        var provider = jagg.getUser().username;
+        var APIProviderImpl = Packages.org.wso2.carbon.apimgt.impl.APIProviderImpl;
+        var apiProvider = new APIProviderImpl(provider);
+        var endpoints = apiProvider.getEndpoints();
+        var endpointsList = "";
+        var endpointOb;
+        var endpointsLength = endpoints.size();
+        for(var i = 0 ; i < endpoints.size(); i++) {
+            endpointOb = endpoints.get(i);
+            endpointsList += endpointOb.getName();
+            if(i != (endpointsLength -1)) {
+                endpointsList += ",";
+            }
+        }
         name = request.getParameter("name");
         version = request.getParameter("version");
         provider = request.getParameter("provider");        
@@ -27,7 +40,8 @@ jagg.block("item-implement", {
             "api":api,
             "isPermitted":isPermitted,
             "isCreatePermitted":isCreatePermitted,
-            "tenant":tenant
+            "tenant":tenant,
+            "endpointsList":endpointsList
         }
     }
 
