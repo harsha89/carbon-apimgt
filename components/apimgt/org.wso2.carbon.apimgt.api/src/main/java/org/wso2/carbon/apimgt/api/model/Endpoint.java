@@ -26,7 +26,7 @@ public class Endpoint {
     private String name;
     private String version;
     private String description;
-    private boolean endpointSecured;
+    private boolean endpointSecured = false;
     private String authType;
     private String endpointConfig;
     private String endpointUsername;

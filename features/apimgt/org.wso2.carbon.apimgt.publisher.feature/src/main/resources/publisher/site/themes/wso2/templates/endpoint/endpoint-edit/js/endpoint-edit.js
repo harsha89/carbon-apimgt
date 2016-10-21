@@ -60,13 +60,7 @@ $(document).ready(function () {
             {
                 jagg.message({
                     content: i18n.t(successMesssage),
-                    type: 'confirm',
-                    okCallback: function () {
-                        location.href = 'site/pages/endpoints.jag';
-                    },
-                    cancelCallback: function () {
-                        location.href = 'site/pages/endpoints.jag';
-                    }
+                    type: 'custom',
                 });
             },
             error: function(data) {
@@ -80,14 +74,12 @@ $(document).ready(function () {
 });
 
 function showHideEndpointDivs() {
-    var isSecured = $("#endpointType").val();
+    var isSecured = $("#epSecurity").val();
     if (isSecured == "secured") {
         $("#endpointAuthType").show();
         $("#credentials").show();
-        $("#epSecurity").val("secured");
     } else {
         $("#endpointAuthType").hide();
         $("#credentials").hide();
-        $("#epSecurity").val("nonecured");
     }
 };

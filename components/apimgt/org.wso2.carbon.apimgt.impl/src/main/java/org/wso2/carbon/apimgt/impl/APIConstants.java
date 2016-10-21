@@ -1261,8 +1261,27 @@ public final class APIConstants {
     public static final String ENDPOINT_TOTAL = "TOTAL";
     public static final String COMMA = ",";
     public static final String ENDPOINT_TYPE = "endpoint_type";
+    public static final String SANDBOX_ENDPOINT_TYPE = "sandbox_endpoint_type";
+    public static final String ENDPOINT_TYPE_HTTP = "http";
+    public static final String ENDPOINT_TYPE_LOAD_BALANCE = "load_balance";
+    public static final String ENDPOINT_TYPE_FAIL_OVER = "fail_over";
     public static final String PRODUCTION_ENDPOINTS = "production_endpoints";
+    public static final String PRODUCTION_FAILOVERS = "production_failovers";
+    public static final String ALGO_COMBO = "algoCombo";
+    public static final String ALGO_CLASS_NAME = "algoClassName";
+    public static final String SESSION_MANAGEMENT = "sessionManagement";
+    public static final String SESSION_TIME_OUT = "sessionTimeOut";
+    public static final String SANDBOX_ALGO_COMBO = "sandboxAlgoCombo";
+    public static final String SANDBOX_ALGO_CLASS_NAME = "sandboxAlgoClassName";
+    public static final String SANDBOX_SESSION_MANAGEMENT = "sandboxSessionManagement";
+    public static final String SANDBOX_SESSION_TIME_OUT = "sandboxSessionTimeOut";
+    public static final String ENDPOINTS = "endpoints";
+    public static final String FAILOVERS = "failovers";
     public static final String SANDBOX_ENDPOINTS = "sandbox_endpoints";
+    public static final String SANDBOX = "sandbox";
+    public static final String DIGEST_AUTH = "digestAuth";
+    public static final String BASIC_AUTH = "basicAuth";
+    public static final String SANDBOX_FAILOVERS = "sandbox_failovers";
     public static final String DEFINED = "defined";
     public static final String URL = "url";
 }

@@ -18,6 +18,7 @@ package org.wso2.carbon.apimgt.impl.template;
 
 import org.apache.velocity.VelocityContext;
 import org.wso2.carbon.apimgt.api.model.API;
+import org.wso2.carbon.apimgt.api.model.Endpoint;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.apache.commons.codec.binary.Base64;
@@ -38,19 +39,58 @@ public class SecurityConfigContext extends ConfigContextDecorator {
 
         String alias =  api.getId().getProviderName() + "--" + api.getId().getApiName()
                         + api.getId().getVersion();
-        String unpw = api.getEndpointUTUsername() + ":" + api.getEndpointUTPassword();
+        String sandboxAlias =  api.getId().getProviderName() + "--" + api.getId().getApiName()
+                        + api.getId().getVersion() + "_" + APIConstants.SANDBOX;
 
         boolean isSecureVaultEnabled = Boolean.parseBoolean(ServiceReferenceHolder.getInstance().
                                                      getAPIManagerConfigurationService().getAPIManagerConfiguration().
                                                      getFirstProperty(APIConstants.API_SECUREVAULT_ENABLE));
-        
-        context.put("isEndpointSecured", api.isEndpointSecured());
-        context.put("isEndpointAuthDigest", api.isEndpointAuthDigest());
-        context.put("username", api.getEndpointUTUsername());
-        context.put("securevault_alias", alias);
-        context.put("base64unpw", new String(Base64.encodeBase64(unpw.getBytes())));
-        context.put("isSecureVaultEnabled", isSecureVaultEnabled);
-        
+        if(!APIConstants.DEFINED.equalsIgnoreCase(api.getEndpointType())) {
+            String unpw = api.getEndpointUTUsername() + ":" + api.getEndpointUTPassword();
+            context.put("isEndpointSecured", api.isEndpointSecured());
+            context.put("isEndpointAuthDigest", api.isEndpointAuthDigest());
+            context.put("username", api.getEndpointUTUsername());
+            context.put("securevault_alias", alias);
+            context.put("base64unpw", new String(Base64.encodeBase64(unpw.getBytes())));
+            context.put("isSecureVaultEnabled", isSecureVaultEnabled);
+        } else {
+            Endpoint productionEndpoint = api.getProductionEndpoint();
+            Endpoint sandboxEndpoint = api.getSandboxEndpoint();
+            //Production endpoint related properties
+            String productionPassword = "";
+            char[] productionPasswordCharSeq = productionEndpoint.getEndpointPassword();
+            if(productionPasswordCharSeq != null) {
+                productionPassword = new String(productionPasswordCharSeq);
+            }
+            String unpw = productionEndpoint.getEndpointUsername() + ":" + productionPassword;
+            context.put("isEndpointSecured", productionEndpoint.isEndpointSecured());
+            boolean isDigestAuth = false;
+            if(APIConstants.DIGEST_AUTH.equalsIgnoreCase(productionEndpoint.getAuthType())) {
+                isDigestAuth = true;
+            }
+            context.put("isEndpointAuthDigest", isDigestAuth);
+                context.put("username", productionEndpoint.getEndpointUsername());
+            context.put("securevault_alias", alias);
+            context.put("base64unpw", new String(Base64.encodeBase64(unpw.getBytes())));
+            context.put("isSecureVaultEnabled", isSecureVaultEnabled);
+
+            //sandbox endpoint related properties
+            String sandboxPassword = "";
+            char[] sandboxPasswordCharSeq = productionEndpoint.getEndpointPassword();
+            if(sandboxPasswordCharSeq != null) {
+                sandboxPassword = new String(sandboxPasswordCharSeq);
+            }
+            String unpwsandbox = sandboxEndpoint.getEndpointUsername() + ":" + sandboxPassword;
+            context.put("isSandboxEndpointSecured", sandboxEndpoint.isEndpointSecured());
+            boolean isSandboxDigestAuth = false;
+            if(APIConstants.DIGEST_AUTH.equalsIgnoreCase(sandboxEndpoint.getAuthType())) {
+                isSandboxDigestAuth = true;
+            }
+            context.put("isSandboxEndpointAuthDigest", isSandboxDigestAuth);
+            context.put("sandboxUsername", productionEndpoint.getEndpointUsername());
+            context.put("sandbox_securevault_alias", sandboxAlias);
+            context.put("sandboxbase64unpw", new String(Base64.encodeBase64(unpwsandbox.getBytes())));
+        }
         return context;
     }
 

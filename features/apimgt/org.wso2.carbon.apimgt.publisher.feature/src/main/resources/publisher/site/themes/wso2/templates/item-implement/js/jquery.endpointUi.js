@@ -51,6 +51,7 @@
     });
 
     var pluginName = "apimEndpointUi";
+    var defaultDefinedEndpoint = "";
 
     var defaults = {
          
@@ -66,6 +67,9 @@
         var endpointList = null;
         if(endpointString != null && endpointList != "") {
             endpointList = endpointString.split(',');
+            if(endpointList.length > 0) {
+                defaultDefinedEndpoint = endpointList[0];
+            }
         }
         this.config.endpointList = endpointList;
         if(this.options.config != undefined && this.options.config != "")
@@ -133,8 +137,8 @@
                 this.config.sandbox_endpoints = [{"url":"default"}];
                 $('#show-more-options').show();
             } else if(this.config.endpoint_type == "defined"){
-                var sandboxEndpointName = $("#sandbox_endpoints_combo").val();
-                var productionEndpointName = $("#production_endpoints_combo").val();
+                var sandboxEndpointName = defaultDefinedEndpoint;
+                var productionEndpointName = defaultDefinedEndpoint;
                 this.config.production_endpoints = [{"url":sandboxEndpointName}];
                 this.config.sandbox_endpoints = [{"url":productionEndpointName}];
                 $('#show-more-options').hide();
@@ -297,7 +301,7 @@
             config.sandbox_endpoints  = this._clean_empty_endpoints(config.sandbox_endpoints);
             config.production_failovers  = this._clean_empty_endpoints(config.production_failovers);
             config.sandbox_failovers  = this._clean_empty_endpoints(config.sandbox_failovers);
-
+            delete config.endpointList;
             // if other than load balanced convert prod and sand ep to object
             if(config.endpoint_type != "load_balance"){
                 if(config.production_endpoints)

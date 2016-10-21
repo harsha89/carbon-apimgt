@@ -24,9 +24,7 @@
     var editEndpointUrl = jagg.getMappedUrl("/site/pages/endpoint-edit.jag") + urlPrefix;
 
     var infoUrl = jagg.getAbsoluteUrl("/site/pages/item-info.jag") + urlPrefix;
-    ;
     var infoMappedUrl = jagg.getMappedUrl("/site/pages/item-info.jag") + urlPrefix;
-    ;
 
     var subsUrl = jagg.getAbsoluteUrl("/site/pages/subscriptions.jag") + urlPrefix;
     var subsMappedUrl = jagg.getMappedUrl("/site/pages/subscriptions.jag") + urlPrefix;

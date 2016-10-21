@@ -1500,7 +1500,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             //Check the endpoint config whether it's defined endpoint or not
             JSONParser parser = new JSONParser();
             String configJson = api.getEndpointConfig();
-            if(StringUtils.isEmpty(configJson)) {
+            if(!StringUtils.isEmpty(configJson)) {
                 Object config = parser.parse(configJson);
                 JSONObject endpointObject = (JSONObject) config;
                 Object endpointTypeOb = endpointObject.get(APIConstants.ENDPOINT_TYPE);

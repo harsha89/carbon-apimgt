@@ -103,7 +103,7 @@
     </label>
     <div class="col-sm-4">
     <% if(endpoint != null) { %>
-       <select class="select required form-control" id="endpointType" name="endpointType" onchange="showHideEndpointDivs()">
+       <select class="select required form-control" id="epSecurity" name="epSecurity" onchange="showHideEndpointDivs()">
            <option value="nonsecured" <%if(!endpoint.isEndpointSecured()){%> selected="selected" <%}%>><%=i18n.localize("Non Secured")%></option>
            <option value="secured" <%if(endpoint.isEndpointSecured()){%> selected="selected" <%}%>><%=i18n.localize("Secured")%></option>
        </select>
