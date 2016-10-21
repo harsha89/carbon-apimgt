@@ -1507,7 +1507,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 String endpointType = endpointTypeOb.toString();
                 if(APIConstants.DEFINED.equalsIgnoreCase(endpointType)) {
                     JSONObject productionEndpointElement = (JSONObject) endpointObject.get(APIConstants.PRODUCTION_ENDPOINTS);
-                    JSONObject sandboxEndpoinElement = (JSONObject) endpointObject.get(APIConstants.SANDBOX_ENDPOINTS);
+                    JSONObject sandboxEndpointElement = (JSONObject) endpointObject.get(APIConstants.SANDBOX_ENDPOINTS);
                     if(productionEndpointElement != null) {
                         Object productionEndpointOb = productionEndpointElement.get(APIConstants.URL);
                         if(productionEndpointOb != null) {
@@ -1518,12 +1518,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
                     }
 
-                    if(sandboxEndpoinElement != null) {
-                            Object sandboxEndpointOb = productionEndpointElement.get(APIConstants.URL);
+                    if(sandboxEndpointElement != null) {
+                            Object sandboxEndpointOb = sandboxEndpointElement.get(APIConstants.URL);
                             if(sandboxEndpointOb != null) {
                                 String sandboxEndpointName = sandboxEndpointOb.toString();
                                 Endpoint sandboxEndpoint = getEndpointByName(sandboxEndpointName);
-                                api.setProductionEndpoint(sandboxEndpoint);
+                                api.setSandboxEndpoint(sandboxEndpoint);
                             }
                     }
 

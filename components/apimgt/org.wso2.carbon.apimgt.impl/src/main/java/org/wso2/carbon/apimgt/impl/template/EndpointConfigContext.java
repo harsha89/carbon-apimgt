@@ -84,7 +84,7 @@ public class EndpointConfigContext extends ConfigContextDecorator {
                         }
                         //Sandbox endpoint config setting up
 
-                        Endpoint sandboxEndpoint = api.getProductionEndpoint();
+                        Endpoint sandboxEndpoint = api.getSandboxEndpoint();
                         if (sandboxEndpoint != null) {
                             String sandboxEndpointString = sandboxEndpoint.getEndpointConfig();
                             if (!StringUtils.isEmpty(sandboxEndpointString)) {
