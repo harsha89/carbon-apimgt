@@ -2,9 +2,6 @@
 <% var i, length, doc = outputs.doc;
 
 %>
-<script type="application/javascript">
-
-</script>
 <h2><%=encode.forHtml(doc.docName)%></h2>
 <br/>
 <div>
@@ -12,12 +9,8 @@
     <%if(!doc.content && doc.content==""){%>
     <%=i18n.localize("No document content has been added yet.")%>
     <%}else{%>
-    <div id="myContentDiv">
-        <%=doc.content%>
-    </div>
+    <%=doc.content%>
     <%}%>
-    </div>
-    <div id="myContent">
     </div>
     </div>
 </div>
