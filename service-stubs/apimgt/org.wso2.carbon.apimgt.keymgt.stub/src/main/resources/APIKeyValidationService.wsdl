@@ -80,6 +80,22 @@
                </xs:sequence>
             </xs:complexType>
          </xs:element>
+         <xs:element name="validateSubscription">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="context" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="consumerKey" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="validateSubscriptionResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2129:APIKeyValidationInfoDTO"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
          <xs:element name="getAllURITemplates">
             <xs:complexType>
                <xs:sequence>
@@ -208,11 +224,17 @@
    <wsdl:message name="validateKeyRequest">
       <wsdl:part name="parameters" element="ns1:validateKey"/>
    </wsdl:message>
+   <wsdl:message name="validateSubscriptionRequest">
+      <wsdl:part name="parameters" element="ns1:validateSubscription"/>
+   </wsdl:message>
    <wsdl:message name="validateKeyforHandshakeRequest">
       <wsdl:part name="parameters" element="ns1:validateKeyforHandshake"/>
    </wsdl:message>
    <wsdl:message name="validateKeyResponse">
       <wsdl:part name="parameters" element="ns1:validateKeyResponse"/>
+   </wsdl:message>
+   <wsdl:message name="validateSubscriptionResponse">
+      <wsdl:part name="parameters" element="ns1:validateSubscriptionResponse"/>
    </wsdl:message>
    <wsdl:message name="validateKeyforHandshakeResponse">
       <wsdl:part name="parameters" element="ns1:validateKeyforHandshakeResponse"/>
@@ -235,6 +257,12 @@
          <wsdl:output message="tns:validateKeyResponse" wsaw:Action="urn:validateKeyResponse"/>
          <wsdl:fault message="tns:APIKeyValidationServiceAPIKeyMgtException" name="APIKeyValidationServiceAPIKeyMgtException" wsaw:Action="urn:validateKeyAPIKeyValidationServiceAPIKeyMgtException"/>
          <wsdl:fault message="tns:APIKeyValidationServiceAPIManagementException" name="APIKeyValidationServiceAPIManagementException" wsaw:Action="urn:validateKeyAPIKeyValidationServiceAPIManagementException"/>
+      </wsdl:operation>
+      <wsdl:operation name="validateSubscription">
+         <wsdl:input message="tns:validateSubscriptionRequest" wsaw:Action="urn:validateSubscription"/>
+         <wsdl:output message="tns:validateSubscriptionResponse" wsaw:Action="urn:validateSubscriptionResponse"/>
+         <wsdl:fault message="tns:APIKeyValidationServiceAPIKeyMgtException" name="APIKeyValidationServiceAPIKeyMgtException" wsaw:Action="urn:validateSubscriptionAPIKeyValidationServiceAPIKeyMgtException"/>
+         <wsdl:fault message="tns:APIKeyValidationServiceAPIManagementException" name="APIKeyValidationServiceAPIManagementException" wsaw:Action="urn:validateSubscriptionAPIKeyValidationServiceAPIManagementException"/>
       </wsdl:operation>
       <wsdl:operation name="validateKeyforHandshake">
          <wsdl:input message="tns:validateKeyforHandshakeRequest" wsaw:Action="urn:validateKeyforHandshake"/>
@@ -277,6 +305,21 @@
       </wsdl:operation>
       <wsdl:operation name="validateKey">
          <soap:operation soapAction="urn:validateKey" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="APIKeyValidationServiceAPIKeyMgtException">
+            <soap:fault use="literal" name="APIKeyValidationServiceAPIKeyMgtException"/>
+         </wsdl:fault>
+         <wsdl:fault name="APIKeyValidationServiceAPIManagementException">
+            <soap:fault use="literal" name="APIKeyValidationServiceAPIManagementException"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="validateSubscription">
+         <soap:operation soapAction="urn:validateSubscription" style="document"/>
          <wsdl:input>
             <soap:body use="literal"/>
          </wsdl:input>
@@ -353,6 +396,21 @@
             <soap12:fault use="literal" name="APIKeyValidationServiceAPIManagementException"/>
          </wsdl:fault>
       </wsdl:operation>
+      <wsdl:operation name="validateSubscription">
+         <soap12:operation soapAction="urn:validateSubscription" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="APIKeyValidationServiceAPIKeyMgtException">
+            <soap12:fault use="literal" name="APIKeyValidationServiceAPIKeyMgtException"/>
+         </wsdl:fault>
+         <wsdl:fault name="APIKeyValidationServiceAPIManagementException">
+            <soap12:fault use="literal" name="APIKeyValidationServiceAPIManagementException"/>
+         </wsdl:fault>
+      </wsdl:operation>
       <wsdl:operation name="validateKeyforHandshake">
          <soap12:operation soapAction="urn:validateKeyforHandshake" style="document"/>
          <wsdl:input>
@@ -391,6 +449,15 @@
       </wsdl:operation>
       <wsdl:operation name="validateKey">
          <http:operation location="validateKey"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="validateSubscription">
+         <http:operation location="validateSubscription"/>
          <wsdl:input>
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>
