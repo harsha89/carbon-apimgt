@@ -55,7 +55,7 @@ public class MSPowerpointIndexerTest {
         PowerPointExtractor powerPointExtractor = Mockito.mock(PowerPointExtractor.class);
         XSLFPowerPointExtractor xslfExtractor = Mockito.mock(XSLFPowerPointExtractor.class);
         XMLSlideShow xmlSlideShow = Mockito.mock(XMLSlideShow.class);
-        PowerMockito.whenNew(POIFSFileSystem.class).withArguments(Mockito.anyObject())
+        PowerMockito.whenNew(POIFSFileSystem.class).withArguments(Mockito.any(InputStream.class))
                 .thenThrow(OfficeXmlFileException.class)
                 .thenReturn(ppExtractor)
                 .thenThrow(APIManagementException.class);
@@ -91,7 +91,7 @@ public class MSPowerpointIndexerTest {
 
     @Test(expected = SolrException.class)
     public void testShouldThrowExceptionWhenFailToReadFile() throws Exception {
-        PowerMockito.whenNew(POIFSFileSystem.class).withArguments(Mockito.anyObject())
+        PowerMockito.whenNew(POIFSFileSystem.class).withArguments(Mockito.any(InputStream.class))
                 .thenThrow(OfficeXmlFileException.class);
         PowerMockito.whenNew(XMLSlideShow.class).withParameterTypes(InputStream.class)
                 .withArguments(Mockito.any())
