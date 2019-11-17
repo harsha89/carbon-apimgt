@@ -18,16 +18,13 @@
  */
 
     include("/services/constants.jag");
-    var appUtils = require("/services/utils.js");
-
-    var app = require("/site/public/theme/settings.js").Settings.app;
+    include("/services/jagg.jag");
+    var app = require("/site/public/theme/defaultTheme.js").Configurations.app;
     var utils = Packages.org.wso2.carbon.apimgt.impl.utils.APIUtil;
-    var log = new Log("Login Callback Endpoint: ");
 
     var serverUrl = '';
-    var forwarded_for = request.getHeader(app.customUrl.forwardedHeader);
-    if (app.customUrl.enabled && forwarded_for) {
-        serverUrl = "https://" + forwarded_for;
+    if (app.reverseProxy.enabled === true) {
+        serverUrl = app.reverseProxy.origin;
     } else {
         serverUrl = utils.getServerURL();
     }
@@ -47,7 +44,7 @@
     var String = Packages.java.lang.String;
     var Integer = Packages.java.lang.Integer;
     var base64encoded = Base64.encode(new String(clientId + ":" + clientSecret).getBytes());
-    var tokenEndpoint = appUtils.getLoopbackOrigin() + TOKEN_URL_SUFFIX;
+    var tokenEndpoint = utils.getServerURL() + TOKEN_URL_SUFFIX;
     var result = post(tokenEndpoint, tokenRequestData, {"Authorization": "Basic " + base64encoded});
 
     response.contentType = "application/json";
@@ -99,7 +96,7 @@
         'path': app.context + "/",
         "httpOnly": true,
         "secure": true,
-        "maxAge": 86400 // TODO: Default value a day, need to get this from idn configs ~tmkb
+        "maxAge": -1
     };
     response.addCookie(cookie);
 
@@ -117,7 +114,7 @@
         'value': refreshTokenPart1,
         'path': app.context + "/",
         "secure": true,
-        "maxAge": 86400 // TODO: Default value a day, need to get this from idn configs ~tmkb
+        "maxAge": 86400
     };
     response.addCookie(cookie);
 
@@ -143,12 +140,12 @@
     if (state !== null) {
         state = decodeURIComponent(state);
         if ( state !== '/') {
-            response.sendRedirect(app.context + state);
+            response.sendRedirect("/publisher" + state);
         } else {
-            response.sendRedirect(app.context);
+            response.sendRedirect("/publisher/apis");
         }
     } else {
-        response.sendRedirect(app.context);
+        response.sendRedirect("/publisher/apis");
     }
 
 %>
