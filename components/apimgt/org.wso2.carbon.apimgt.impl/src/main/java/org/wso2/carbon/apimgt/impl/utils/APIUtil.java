@@ -5381,15 +5381,15 @@ public final class APIUtil {
 
             if (APIConstants.API_CUSTOM_SEQUENCE_TYPE_IN.equals(direction)) {
                 seqCollection = (org.wso2.carbon.registry.api.Collection) registry
-                        .get(APIConstants.API_CUSTOM_SEQUENCE_LOCATION + File.separator +
+                        .get(APIConstants.API_CUSTOM_SEQUENCE_LOCATION + "/" +
                                 APIConstants.API_CUSTOM_SEQUENCE_TYPE_IN);
             } else if (APIConstants.API_CUSTOM_SEQUENCE_TYPE_OUT.equals(direction)) {
                 seqCollection = (org.wso2.carbon.registry.api.Collection) registry
-                        .get(APIConstants.API_CUSTOM_SEQUENCE_LOCATION + File.separator +
+                        .get(APIConstants.API_CUSTOM_SEQUENCE_LOCATION + "/" +
                                 APIConstants.API_CUSTOM_SEQUENCE_TYPE_OUT);
             } else if (APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT.equals(direction)) {
                 seqCollection = (org.wso2.carbon.registry.api.Collection) registry
-                        .get(APIConstants.API_CUSTOM_SEQUENCE_LOCATION + File.separator +
+                        .get(APIConstants.API_CUSTOM_SEQUENCE_LOCATION + "/" +
                                 APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT);
             }
 
@@ -7114,6 +7114,9 @@ public final class APIUtil {
     }
 
     public static int getManagementTransportPort (String mgtTransport){
+        if (StringUtils.isEmpty(mgtTransport)) {
+            mgtTransport = APIConstants.HTTPS_PROTOCOL;
+        }
         AxisConfiguration axisConfiguration = ServiceReferenceHolder
                 .getContextService().getServerConfigContext().getAxisConfiguration();
         int mgtTransportPort = CarbonUtils.getTransportProxyPort(axisConfiguration, mgtTransport);
@@ -7121,6 +7124,30 @@ public final class APIUtil {
             mgtTransportPort = CarbonUtils.getTransportPort(axisConfiguration, mgtTransport);
         }
         return mgtTransportPort;
+    }
+
+    public static int getCarbonTransportPort(String mgtTransport) {
+
+        if (StringUtils.isEmpty(mgtTransport)) {
+            mgtTransport = APIConstants.HTTPS_PROTOCOL;
+        }
+        AxisConfiguration axisConfiguration = ServiceReferenceHolder
+                .getContextService().getServerConfigContext().getAxisConfiguration();
+        return CarbonUtils.getTransportPort(axisConfiguration, mgtTransport);
+
+    }
+
+    /*
+     * Checks whether the proxy port is configured.
+     * @param transport  The transport
+     * @return boolean proxyport is enabled
+     * */
+    public static boolean isProxyPortEnabled(String mgtTransport) {
+
+        AxisConfiguration axisConfiguration = ServiceReferenceHolder
+                .getContextService().getServerConfigContext().getAxisConfiguration();
+        int mgtTransportProxyPort = CarbonUtils.getTransportProxyPort(axisConfiguration, mgtTransport);
+        return mgtTransportProxyPort > 0;
     }
 
     public static String getServerURL() throws APIManagementException {
