@@ -18,13 +18,12 @@
  */
 
     include("/services/constants.jag");
-    var appUtils = require("/services/utils.js");
+    include("/services/jagg.jag");
     var app = require("/site/public/theme/settings.js").Settings.app;
     var utils = Packages.org.wso2.carbon.apimgt.impl.utils.APIUtil;
     var serverUrl = "";
-    var forwarded_for = request.getHeader(app.customUrl.forwardedHeader);
-    if (app.customUrl.enabled && forwarded_for) {
-        serverUrl = MGT_TRANSPORT + forwarded_for;
+        if (app.reverseProxy.enabled === true) {
+        serverUrl = app.reverseProxy.origin;
     } else {
         serverUrl = utils.getServerURL();
     }
@@ -43,7 +42,7 @@
     var String = Packages.java.lang.String;
     var Integer = Packages.java.lang.Integer;
     var base64encoded = Base64.encode ( new String (clientId + ":" + clientSecret).getBytes());
-    var tokenEndpoint = appUtils.getLoopbackOrigin() + TOKEN_URL_SUFFIX;
+    var tokenEndpoint = utils.getServerURL() + TOKEN_URL_SUFFIX;
     var result = post(tokenEndpoint, tokenRequestData,{"Authorization": "Basic " + base64encoded});
 
     response.contentType = "application/json";
@@ -93,9 +92,9 @@
     var state = request.getParameter("state");
     if (state !== null) {
         state = decodeURI(state);
-        response.sendRedirect(app.context + state);
+        response.sendRedirect("/devportal" + state);
     } else {
-        response.sendRedirect(app.context);
+        response.sendRedirect("/devportal/apis");
     }
 
 %>
