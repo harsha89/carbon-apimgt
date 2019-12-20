@@ -302,6 +302,7 @@ public final class APIUtil {
     private static final String NONE = "NONE";
     private static final String MIGRATION = "Migration";
     private static final String VERSION_3 = "3.0.0";
+    private static final String META = "Meta";
 
     //Need tenantIdleTime to check whether the tenant is in idle state in loadTenantConfig method
     static {
@@ -4054,8 +4055,9 @@ public final class APIUtil {
                         .getAdminRoleName();
                 for (int i = 0; i < tenantScopesArray.size(); i++) {
                     JSONObject scope = (JSONObject) tenantScopesArray.get(i);
-                    if (APIConstants.APIM_SUBSCRIBE_SCOPE.equals(scope.get(APIConstants.REST_API_SCOPE_NAME))) {
-                        String roles = scope.get(APIConstants.REST_API_SCOPE_ROLE).toString();
+                    String roles = scope.get(APIConstants.REST_API_SCOPE_ROLE).toString();
+                    if (APIConstants.APIM_SUBSCRIBE_SCOPE.equals(scope.get(APIConstants.REST_API_SCOPE_NAME)) &&
+                            !roles.contains(adminRoleName)) {
                         tenantScopesArray.remove(i);
                         JSONObject scopeJson = new JSONObject();
                         scopeJson.put(APIConstants.REST_API_SCOPE_NAME, APIConstants.APIM_SUBSCRIBE_SCOPE);
@@ -4066,8 +4068,10 @@ public final class APIUtil {
                     }
                     if (isRoleUpdated) {
                         JSONObject metaInfo = new JSONObject();
-                        metaInfo.put(VERSION_3, true);
-                        tenantConf.put(MIGRATION, metaInfo);
+                        JSONObject migrationInfo = new JSONObject();
+                        migrationInfo.put(VERSION_3, true);
+                        metaInfo.put(MIGRATION, migrationInfo);
+                        tenantConf.put(META, metaInfo);
                     }
                 }
             } catch (UserStoreException e) {
