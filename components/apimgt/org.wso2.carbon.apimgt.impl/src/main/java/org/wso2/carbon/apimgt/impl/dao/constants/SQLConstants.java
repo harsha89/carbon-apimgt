@@ -2766,7 +2766,7 @@ public class SQLConstants {
                     "  NAME IN (";
 
     public static final String GET_SUBSCRIPTION_POLICIES_BY_POLICY_NAMES_SUFFIX =
-            ") AND TENANT_ID =? ;";
+            ") AND TENANT_ID =?";
 
     public static final String GET_GLOBAL_POLICIES =
             " SELECT " +
@@ -3077,7 +3077,7 @@ public class SQLConstants {
     public static final String GET_RESOURCES_OF_PRODUCT = 
             "SELECT API_UM.URL_MAPPING_ID, API_UM.URL_PATTERN, API_UM.HTTP_METHOD, API_UM.AUTH_SCHEME, "
             + "API_UM.THROTTLING_TIER, API.API_PROVIDER, API.API_NAME, API.API_VERSION, API.CONTEXT, PRO_UM.API_ID "
-            + "FROM AM_API_URL_MAPPING AS API_UM, AM_API_PRODUCT_MAPPING AS PRO_UM, AM_API AS API "
+            + "FROM AM_API_URL_MAPPING API_UM, AM_API_PRODUCT_MAPPING PRO_UM, AM_API API "
             + "WHERE API_UM.URL_MAPPING_ID = PRO_UM.URL_MAPPING_ID AND API_UM.API_ID = API.API_ID AND PRO_UM.API_ID = ?";
 
     /** Throttle related constants**/
