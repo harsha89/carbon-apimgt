@@ -300,6 +300,9 @@ public final class APIUtil {
 
     private static final String SHA256_WITH_RSA = "SHA256withRSA";
     private static final String NONE = "NONE";
+    private static final String MIGRATION = "Migration";
+    private static final String VERSION_3 = "3.0.0";
+    private static final String META = "Meta";
 
     //Need tenantIdleTime to check whether the tenant is in idle state in loadTenantConfig method
     static {
@@ -4037,19 +4040,61 @@ public final class APIUtil {
         JSONObject scopeConfigLocal = getRESTAPIScopesConfigFromFileSystem();
         Map<String, String> scopesTenant = getRESTAPIScopesFromConfig(scopesConfigTenant);
         Map<String, String> scopesLocal = getRESTAPIScopesFromConfig(scopeConfigLocal);
-        JSONArray tenantScopesArray = (JSONArray)scopesConfigTenant.get(APIConstants.REST_API_SCOPE);
+        JSONArray tenantScopesArray = (JSONArray) scopesConfigTenant.get(APIConstants.REST_API_SCOPE);
+        boolean isRoleUpdated = false;
+        boolean isMigrated = false;
+        JSONObject metaJson = (JSONObject) tenantConf.get(MIGRATION);
+        if (metaJson != null && metaJson.get(VERSION_3) != null) {
+            isMigrated = Boolean.parseBoolean(metaJson.get(VERSION_3).toString());
+        }
 
-        Set<String> scopes = scopesLocal.keySet();
-        //Find any scopes that are not added to tenant conf which is available in local tenant-conf
-        scopes.removeAll(scopesTenant.keySet());
-        if (!scopes.isEmpty()) {
-            for (String scope: scopes) {
-                JSONObject scopeJson = new JSONObject();
-                scopeJson.put(APIConstants.REST_API_SCOPE_NAME, scope);
-                scopeJson.put(APIConstants.REST_API_SCOPE_ROLE, scopesLocal.get(scope));
-                tenantScopesArray.add(scopeJson);
+        if (!isMigrated) {
+            try {
+                //Get admin role name of the current domain
+                String adminRoleName = CarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration()
+                        .getAdminRoleName();
+                for (int i = 0; i < tenantScopesArray.size(); i++) {
+                    JSONObject scope = (JSONObject) tenantScopesArray.get(i);
+                    String roles = scope.get(APIConstants.REST_API_SCOPE_ROLE).toString();
+                    if (APIConstants.APIM_SUBSCRIBE_SCOPE.equals(scope.get(APIConstants.REST_API_SCOPE_NAME)) &&
+                            !roles.contains(adminRoleName)) {
+                        tenantScopesArray.remove(i);
+                        JSONObject scopeJson = new JSONObject();
+                        scopeJson.put(APIConstants.REST_API_SCOPE_NAME, APIConstants.APIM_SUBSCRIBE_SCOPE);
+                        scopeJson.put(APIConstants.REST_API_SCOPE_ROLE, roles
+                                + APIConstants.MULTI_ATTRIBUTE_SEPARATOR_DEFAULT + adminRoleName);
+                        tenantScopesArray.add(scopeJson);
+                        isRoleUpdated = true;
+                        break;
+                    }
+                }
+                if (isRoleUpdated) {
+                    JSONObject metaInfo = new JSONObject();
+                    JSONObject migrationInfo = new JSONObject();
+                    migrationInfo.put(VERSION_3, true);
+                    metaInfo.put(MIGRATION, migrationInfo);
+                    tenantConf.put(META, metaInfo);
+                }
+            } catch (UserStoreException e) {
+                String tenantDomain = getTenantDomainFromTenantId(tenantId);
+                String errorMessage = "Error while retrieving admin role name of " + tenantDomain;
+                log.error(errorMessage, e);
+                throw new APIManagementException(errorMessage, e);
             }
-            return Optional.of(ArrayUtils.toObject(tenantConf.toJSONString().getBytes()));
+            Set<String> scopes = scopesLocal.keySet();
+            //Find any scopes that are not added to tenant conf which is available in local tenant-conf
+            scopes.removeAll(scopesTenant.keySet());
+            if (!scopes.isEmpty() || isRoleUpdated) {
+                for (String scope : scopes) {
+                    JSONObject scopeJson = new JSONObject();
+                    scopeJson.put(APIConstants.REST_API_SCOPE_NAME, scope);
+                    scopeJson.put(APIConstants.REST_API_SCOPE_ROLE, scopesLocal.get(scope));
+                    tenantScopesArray.add(scopeJson);
+                }
+                return Optional.of(ArrayUtils.toObject(tenantConf.toJSONString().getBytes()));
+            } else {
+                return Optional.empty();
+            }
         } else {
             return Optional.empty();
         }
