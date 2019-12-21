@@ -4044,7 +4044,7 @@ public final class APIUtil {
         boolean isRoleUpdated = false;
         boolean isMigrated = false;
         JSONObject metaJson = (JSONObject) tenantConf.get(MIGRATION);
-        if (metaJson != null) {
+        if (metaJson != null && metaJson.get(VERSION_3) != null) {
             isMigrated = Boolean.parseBoolean(metaJson.get(VERSION_3).toString());
         }
 
@@ -4065,14 +4065,15 @@ public final class APIUtil {
                                 + APIConstants.MULTI_ATTRIBUTE_SEPARATOR_DEFAULT + adminRoleName);
                         tenantScopesArray.add(scopeJson);
                         isRoleUpdated = true;
+                        break;
                     }
-                    if (isRoleUpdated) {
-                        JSONObject metaInfo = new JSONObject();
-                        JSONObject migrationInfo = new JSONObject();
-                        migrationInfo.put(VERSION_3, true);
-                        metaInfo.put(MIGRATION, migrationInfo);
-                        tenantConf.put(META, metaInfo);
-                    }
+                }
+                if (isRoleUpdated) {
+                    JSONObject metaInfo = new JSONObject();
+                    JSONObject migrationInfo = new JSONObject();
+                    migrationInfo.put(VERSION_3, true);
+                    metaInfo.put(MIGRATION, migrationInfo);
+                    tenantConf.put(META, metaInfo);
                 }
             } catch (UserStoreException e) {
                 String tenantDomain = getTenantDomainFromTenantId(tenantId);
