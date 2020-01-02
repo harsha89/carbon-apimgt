@@ -3956,22 +3956,32 @@ public final class APIUtil {
             UserRegistry registry = registryService.getConfigSystemRegistry(tenantID);
             byte[] data = getLocalTenantConfFileData();
             if (registry.resourceExists(APIConstants.API_TENANT_CONF_LOCATION)) {
-                log.debug("tenant-conf of tenant " + tenantID + " is  already uploaded to the registry");
+                if (log.isDebugEnabled()) {
+                    log.debug("tenant-conf of tenant " + tenantID + " is  already uploaded to the registry");
+                }
                 Optional<Byte[]> migratedTenantConf = migrateTenantConfScopes(tenantID);
                 if (migratedTenantConf.isPresent()) {
-                    log.debug("Detected new additions to tenant-conf of tenant " + tenantID);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Detected new additions to tenant-conf of tenant " + tenantID);
+                    }
                     data = ArrayUtils.toPrimitive(migratedTenantConf.get());
                 } else {
-                    log.debug("No changes required in tenant-conf.json of tenant " + tenantID);
+                    if (log.isDebugEnabled()) {
+                        log.debug("No changes required in tenant-conf.json of tenant " + tenantID);
+                    }
                     return;
                 }
             }
-            log.debug("Adding/updating tenant-conf.json to the registry of tenant " + tenantID);
+            if (log.isDebugEnabled()) {
+                log.debug("Adding/updating tenant-conf.json to the registry of tenant " + tenantID);
+            }
             Resource resource = registry.newResource();
             resource.setMediaType(APIConstants.APPLICATION_JSON_MEDIA_TYPE);
             resource.setContent(data);
             registry.put(APIConstants.API_TENANT_CONF_LOCATION, resource);
-            log.debug("Successfully added/updated tenant-conf.json of tenant  " + tenantID);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully added/updated tenant-conf.json of tenant  " + tenantID);
+            }
         } catch (RegistryException e) {
             throw new APIManagementException("Error while saving tenant conf to the registry of tenant " + tenantID, e);
         } catch (IOException e) {
@@ -4109,11 +4119,15 @@ public final class APIUtil {
                     throw new APIManagementException("Error while formatting tenant-conf.json of tenant " + tenantId);
                 }
             } else {
-                log.debug("Scopes in tenant-conf.json in tenant " + tenantId + " are already migrated.");
+                if (log.isDebugEnabled()) {
+                    log.debug("Scopes in tenant-conf.json in tenant " + tenantId + " are already migrated.");
+                }
                 return Optional.empty();
             }
         } else {
-            log.debug("Scopes in tenant-conf.json in tenant " + tenantId + " are already migrated.");
+            if (log.isDebugEnabled()) {
+                log.debug("Scopes in tenant-conf.json in tenant " + tenantId + " are already migrated.");
+            }
             return Optional.empty();
         }
     }
@@ -9518,11 +9532,15 @@ public final class APIUtil {
                     && (StringUtils.countMatches(token, APIConstants.DOT) == 2)) {
                 isJwtToken = true;
             } else {
-                log.debug("Not a valid JWT token. " + getMaskedToken(token));
+                if (log.isDebugEnabled()) {
+                    log.debug("Not a valid JWT token. " + getMaskedToken(token));
+                }
             }
         } catch (JSONException | IllegalArgumentException e) {
             isJwtToken = false;
-            log.debug("Not a valid JWT token. " + getMaskedToken(token), e);
+            if (log.isDebugEnabled()) {
+                log.debug("Not a valid JWT token. " + getMaskedToken(token), e);
+            }
         }
         return isJwtToken;
     }
