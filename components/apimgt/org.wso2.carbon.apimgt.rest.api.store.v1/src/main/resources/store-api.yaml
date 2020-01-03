@@ -4341,9 +4341,6 @@ definitions:
           - ON_HOLD
           - REJECTED
         example: UNBLOCKED
-      redirectionParams:
-        type: string
-        description: A url & other parameters the subscriber can be redirected.
 
 
 #-----------------------------------------------------
