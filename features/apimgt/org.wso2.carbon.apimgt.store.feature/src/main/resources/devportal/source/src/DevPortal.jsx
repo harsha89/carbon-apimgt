@@ -41,16 +41,16 @@ const LoadableProtectedApp = Loadable({
 
 
 /**
- * Root Store component
+ * Root DevPortal component
  *
- * @class Store
+ * @class DevPortal
  * @extends {React.Component}
  */
-class Store extends React.Component {
+class DevPortal extends React.Component {
     /**
-     *Creates an instance of Store.
+     *Creates an instance of DevPortal.
      * @param {*} props Properties passed from the parent component
-     * @memberof Store
+     * @memberof DevPortal
      */
     constructor(props) {
         super(props);
@@ -60,7 +60,8 @@ class Store extends React.Component {
             tenantDomain: null,
             theme: null,
         };
-        this.SetTenantTheme = this.SetTenantTheme.bind(this);
+        this.SetTenantTheme = this.setTenantTheme.bind(this);
+        this.setSettings = this.setSettings.bind(this);
     }
 
     /**
@@ -71,7 +72,7 @@ class Store extends React.Component {
         const promisedSettings = api.getSettings();
         promisedSettings
             .then((response) => {
-                this.setState({ settings: response.body });
+                this.setSettings(response.body);
             }).catch((error) => {
                 console.error(
                     'Error while receiving settings : ',
@@ -82,30 +83,43 @@ class Store extends React.Component {
         if (urlParams.get('tenant') === null || urlParams.get('tenant') === 'carbon.super') {
             this.setState({ theme: Configurations.themes.light });
         } else {
-            this.SetTenantTheme(urlParams.get('tenant'));
+            this.setTenantTheme(urlParams.get('tenant'));
         }
     }
 
     /**
      * Set the tenant domain to state
      * @param {String} tenantDomain tenant domain
-     * @memberof Store
+     * @memberof DevPortal
      */
     setTenantDomain = (tenantDomain) => {
         this.setState({ tenantDomain });
         if (tenantDomain === 'carbon.super') {
             this.setState({ theme: Configurations.themes.light });
         } else {
-            this.SetTenantTheme(tenantDomain);
+            this.setTenantTheme(tenantDomain);
         }
     }
+
+    /**
+      *
+      * for more information about this pattern
+      * reffer https://reactjs.org/docs/context.html#updating-context-from-a-nested-component
+      * @param {Object} settings set the settings state in the APP state, which will implesitly
+      * set in the Settings context
+      * @memberof DevPortal
+      */
+    setSettings(settings) {
+        this.setState({ settings });
+    }
+
 
     /**
      * Load Theme file.
      *
      * @param {string} tenant tenant name
      */
-    SetTenantTheme(tenant) {
+    setTenantTheme(tenant) {
         fetch(`${Settings.app.context}/site/public/tenant_themes/${tenant}/defaultTheme.json`)
             .then(resp => resp.json())
             .then((data) => {
@@ -117,16 +131,22 @@ class Store extends React.Component {
     }
 
     /**
-     * Reners the Store component
+     * Reners the DevPortal component
      * @returns {JSX} this is the description
-     * @memberof Store
+     * @memberof DevPortal
      */
     render() {
         const { settings, tenantDomain, theme } = this.state;
         const { app: { context } } = Settings;
         return (
             settings && theme && (
-                <SettingsProvider value={{ settings, tenantDomain, setTenantDomain: this.setTenantDomain }}>
+                <SettingsProvider value={{
+                    settings,
+                    setSettings: this.setSettings,
+                    tenantDomain,
+                    setTenantDomain: this.setTenantDomain,
+                }}
+                >
                     <MuiThemeProvider theme={createMuiTheme(theme)}>
                         <BrowserRouter basename={context}>
                             <Switch>
@@ -143,4 +163,4 @@ class Store extends React.Component {
     }
 }
 
-export default Store;
+export default DevPortal;

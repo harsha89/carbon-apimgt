@@ -18,12 +18,13 @@
 
 import React, { Component } from 'react';
 import qs from 'qs';
-import { addLocaleData, defineMessages, IntlProvider } from 'react-intl';
+import { addLocaleData, IntlProvider } from 'react-intl';
 import Settings from 'Settings';
 import Tenants from 'AppData/Tenants';
 import SettingsContext from 'AppComponents/Shared/SettingsContext';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
+import API from './data/api';
 import Base from './components/Base/index';
 import AuthManager from './data/AuthManager';
 import Loading from './components/Base/Loading/Loading';
@@ -70,10 +71,9 @@ export default class ProtectedApp extends Component {
      */
     componentDidMount() {
         const { location: { search } } = this.props;
-        const { setTenantDomain } = this.context;
+        const { setTenantDomain, setSettings } = this.context;
         const { tenant } = queryString.parse(search);
         const tenantApi = new Tenants();
-
         tenantApi.getTenantsByState().then((response) => {
             const { list } = response.body;
             if (list.length > 0) {
@@ -102,8 +102,8 @@ export default class ProtectedApp extends Component {
                     error,
                 );
             });
-        const user = AuthManager.getUser();
-        if (user) {
+        const user = AuthManager.getUser(); // Passive user check
+        if (user) { // If token exisit in cookies and user info available in local storage
             const hasViewScope = user.scopes.includes('apim:subscribe');
             if (hasViewScope) {
                 this.setState({ userResolved: true, scopesFound: true });
@@ -115,7 +115,7 @@ export default class ProtectedApp extends Component {
             // If no user data available , Get the user info from existing token information
             // This could happen when OAuth code authentication took place and could send
             // user information via redirection
-            const userPromise = AuthManager.getUserFromToken();
+            const userPromise = AuthManager.getUserFromToken(); // Active user check
             userPromise
                 .then((loggedUser) => {
                     if (loggedUser != null) {
@@ -125,6 +125,18 @@ export default class ProtectedApp extends Component {
                                 userResolved: true,
                                 scopesFound: true,
                             });
+                            // Update the settings context with settings retrived from authenticated user
+                            const api = new API();
+                            const promisedSettings = api.getSettings();
+                            promisedSettings
+                                .then((response) => {
+                                    setSettings(response.body);
+                                }).catch((error) => {
+                                    console.error(
+                                        'Error while receiving settings : ',
+                                        error,
+                                    );
+                                });
                         } else {
                             console.log('No relevant scopes found, redirecting to Anonymous View');
                             this.setState({ userResolved: true });
