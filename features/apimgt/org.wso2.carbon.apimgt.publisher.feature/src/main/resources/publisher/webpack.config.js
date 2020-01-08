@@ -16,7 +16,7 @@
  * under the License.
  *
  */
-
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const path = require('path');
 
 const config = {
@@ -78,9 +78,10 @@ const config = {
         MaterialIcons: 'MaterialIcons',
         Settings: 'Settings',
     },
-    plugins: [],
+    plugins: [new MonacoWebpackPlugin({ languages: ['xml', 'json', 'yaml'], features: [] })],
 };
 
+// Note: for more info about monaco plugin: https://github.com/Microsoft/monaco-editor-webpack-plugin
 if (process.env.NODE_ENV === 'development') {
     config.watch = true;
 } else if (process.env.NODE_ENV === 'production') {
