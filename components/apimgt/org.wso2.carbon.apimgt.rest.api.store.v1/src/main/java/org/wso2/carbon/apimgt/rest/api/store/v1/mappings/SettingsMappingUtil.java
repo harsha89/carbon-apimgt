@@ -24,12 +24,10 @@ import org.apache.commons.io.IOUtils;
 import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.Scope;
-import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
 import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.SettingsDTO;
-import org.wso2.carbon.apimgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 
 import java.io.IOException;
@@ -50,8 +48,22 @@ public class SettingsMappingUtil {
             settingsDTO.setApplicationSharingEnabled(APIUtil.isMultiGroupAppSharingEnabled());
             settingsDTO.setMapExistingAuthApps(APIUtil.isMapExistingAuthAppsEnabled());
             Map<String, Environment> environments = APIUtil.getEnvironments();
-            Environment environment = environments.get(RestApiConstants.DEFAULT_ENVIRONMENT);
-            settingsDTO.apiGatewayEndpoint(environment.getApiGatewayEndpoint());
+            if (environments.isEmpty()) {
+                settingsDTO.apiGatewayEndpoint("http://localhost:8280,https://localhost:8243");
+            } else {
+                for (Map.Entry<String, Environment> entry : environments.entrySet()) {
+                    Environment environment = environments.get(entry.getKey());
+                    if (environment.isDefault()) {
+                        settingsDTO.apiGatewayEndpoint(environment.getApiGatewayEndpoint());
+                        break;
+                    }
+                }
+                if (settingsDTO.getApiGatewayEndpoint() == null) {
+                    Map.Entry<String, Environment> entry = environments.entrySet().iterator().next();
+                    Environment environment = environments.get(entry.getKey());
+                    settingsDTO.apiGatewayEndpoint(environment.getApiGatewayEndpoint());
+                }
+            }
         } else {
             settingsDTO.setScopes(GetScopeList());
             settingsDTO.setApplicationSharingEnabled(APIUtil.isMultiGroupAppSharingEnabled());
