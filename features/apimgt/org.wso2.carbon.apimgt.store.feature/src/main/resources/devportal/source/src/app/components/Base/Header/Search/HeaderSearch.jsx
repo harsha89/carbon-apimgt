@@ -51,8 +51,8 @@ const styles = theme => ({
     },
     input: {
         width: '280px',
-        background: theme.custom.appBar.background,
-        color: theme.palette.getContrastText(theme.custom.appBar.background),
+        background: theme.custom.appBar.searchInputBackground,
+        color: theme.palette.getContrastText(theme.custom.appBar.searchInputBackground),
         '-webkit-transition': 'all .35s ease-in-out',
         transition: 'all .35s ease-in-out',
         padding: '5px 5px 5px 5px',
@@ -60,15 +60,15 @@ const styles = theme => ({
     },
     inputFocused: {
         width: '400px',
-        background: theme.custom.appBar.background,
-        color: theme.palette.getContrastText(theme.custom.appBar.background),
+        background: theme.custom.appBar.searchInputActiveBackground,
+        color: theme.palette.getContrastText(theme.custom.appBar.searchInputActiveBackground),
         padding: '5px 5px 5px 5px',
     },
     searchBox: {
         padding: '5px 5px 5px 5px',
     },
     selectRoot: {
-        background: theme.custom.appBar.background,
+        background: theme.custom.appBar.searchInputBackground,
         borderRight: '1px solid rgba(0, 0, 0, 0.42)',
         minHeight: '40px',
         padding: '5px 5px 5px 15px',
