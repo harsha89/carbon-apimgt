@@ -65,6 +65,10 @@ const styles = (theme) => {
         publicStore: {
             color: theme.palette.getContrastText(theme.custom.appBar.background),
         },
+        linkWrapper: {
+            display: 'flex',
+            marginLeft: 'auto',
+        },
         // Page layout styles
         drawer: {
             top: 64,
@@ -251,6 +255,9 @@ class Layout extends React.Component {
                 banner: {
                     style, text, image, active,
                 },
+                appBar: {
+                    showSearch
+                },
                 footer: {
                     active: footerActive, text: footerText,
                 }
@@ -319,7 +326,7 @@ class Layout extends React.Component {
                                     </Drawer>
                                 </Hidden>
                                 <VerticalDivider height={32} />
-                                <HeaderSearch id='headerSearch' />
+                                {showSearch && (<HeaderSearch id='headerSearch' />)}
                                 {tenantDomain && tenantDomain !== 'INVALID' && (
                                     <Link
                                         style={{
@@ -351,69 +358,71 @@ class Layout extends React.Component {
                                 />
                                 {user ? (
                                     <React.Fragment>
-                                        <Link to='/settings' id='settingsLink'>
-                                            <Button className={classes.userLink}>
-                                                <Icon className={classes.icons}>settings</Icon>
-                                                <Hidden mdDown>
-                                                    <FormattedMessage
-                                                        id='Base.index.settings.caption'
-                                                        defaultMessage='Settings'
-                                                    />
-                                                </Hidden>
+                                        <div className={classes.linkWrapper}>
+                                            <Link to='/settings' id='settingsLink'>
+                                                <Button className={classes.userLink}>
+                                                    <Icon className={classes.icons}>settings</Icon>
+                                                    <Hidden mdDown>
+                                                        <FormattedMessage
+                                                            id='Base.index.settings.caption'
+                                                            defaultMessage='Settings'
+                                                        />
+                                                    </Hidden>
+                                                </Button>
+                                            </Link>
+                                            <Button
+                                                buttonRef={(node) => {
+                                                    this.anchorEl = node;
+                                                }}
+                                                aria-owns={open ? 'menu-list-grow' : null}
+                                                aria-haspopup='true'
+                                                onClick={this.handleToggleUserMenu}
+                                                className={classes.userLink}
+                                                id='userToggleButton'
+                                            >
+                                                <Icon className={classes.icons}>person</Icon>
+                                                {user.name}
                                             </Button>
-                                        </Link>
-                                        <Button
-                                            buttonRef={(node) => {
-                                                this.anchorEl = node;
-                                            }}
-                                            aria-owns={open ? 'menu-list-grow' : null}
-                                            aria-haspopup='true'
-                                            onClick={this.handleToggleUserMenu}
-                                            className={classes.userLink}
-                                            id='userToggleButton'
-                                        >
-                                            <Icon className={classes.icons}>person</Icon>
-                                            {user.name}
-                                        </Button>
-                                        <Popper
-                                            id='userPopup'
-                                            open={this.state.openUserMenu}
-                                            anchorEl={this.anchorEl}
-                                            transition
-                                            disablePortal
-                                            anchorOrigin={{
-                                                vertical: 'bottom',
-                                                horizontal: 'center',
-                                            }}
-                                            transformOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'center',
-                                            }}
-                                        >
-                                            {({ TransitionProps, placement }) => (
-                                                <Grow
-                                                    {...TransitionProps}
-                                                    id='menu-list-grow'
-                                                    style={{
-                                                        transformOrigin:
-                                                            placement === 'bottom' ? 'center top' : 'center bottom',
-                                                    }}
-                                                >
-                                                    <Paper>
-                                                        <ClickAwayListener onClickAway={this.handleCloseUserMenu}>
-                                                            <MenuList>
-                                                                <MenuItem onClick={this.doOIDCLogout}>
-                                                                    <FormattedMessage
-                                                                        id='Base.index.logout'
-                                                                        defaultMessage='Logout'
-                                                                    />
-                                                                </MenuItem>
-                                                            </MenuList>
-                                                        </ClickAwayListener>
-                                                    </Paper>
-                                                </Grow>
-                                            )}
-                                        </Popper>
+                                            <Popper
+                                                id='userPopup'
+                                                open={this.state.openUserMenu}
+                                                anchorEl={this.anchorEl}
+                                                transition
+                                                disablePortal
+                                                anchorOrigin={{
+                                                    vertical: 'bottom',
+                                                    horizontal: 'center',
+                                                }}
+                                                transformOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'center',
+                                                }}
+                                            >
+                                                {({ TransitionProps, placement }) => (
+                                                    <Grow
+                                                        {...TransitionProps}
+                                                        id='menu-list-grow'
+                                                        style={{
+                                                            transformOrigin:
+                                                                placement === 'bottom' ? 'center top' : 'center bottom',
+                                                        }}
+                                                    >
+                                                        <Paper>
+                                                            <ClickAwayListener onClickAway={this.handleCloseUserMenu}>
+                                                                <MenuList>
+                                                                    <MenuItem onClick={this.doOIDCLogout}>
+                                                                        <FormattedMessage
+                                                                            id='Base.index.logout'
+                                                                            defaultMessage='Logout'
+                                                                        />
+                                                                    </MenuItem>
+                                                                </MenuList>
+                                                            </ClickAwayListener>
+                                                        </Paper>
+                                                    </Grow>
+                                                )}
+                                            </Popper>
+                                        </div>
                                     </React.Fragment>
                                 ) : (
                                     <React.Fragment>
@@ -423,12 +432,14 @@ class Layout extends React.Component {
                                      <HowToReg /> sign-up
                                      </Button>
                                      </Link> */}
-                                        <a href={app.context + '/services/configs'}>
-                                            <Button className={classes.userLink}>
-                                                <Icon>person</Icon>
-                                                <FormattedMessage id='Base.index.sign.in' defaultMessage=' Sign-in' />
-                                            </Button>
-                                        </a>
+                                        <div className={classes.linkWrapper}>
+                                            <a href={app.context + '/services/configs'}>
+                                                <Button className={classes.userLink}>
+                                                    <Icon>person</Icon>
+                                                    <FormattedMessage id='Base.index.sign.in' defaultMessage=' Sign-in' />
+                                                </Button>
+                                            </a>
+                                        </div>
                                     </React.Fragment>
                                 )}
                             </Toolbar>
