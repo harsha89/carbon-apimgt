@@ -75,14 +75,14 @@ const styles = theme => ({
     },
     infoButton: {
         margin: theme.spacing(1),
-        color: 'white',
+        color: theme.palette.getContrastText(theme.custom.appBar.background),
     },
     emptyContainer: {
         flexGrow: 1,
     },
     InfoToolTip: {
-        backgroundColor: '#f5f5f9',
-        color: 'rgba(0,0,0,0.87)',
+        backgroundColor: theme.custom.appBar.searchInputBackground,
+        color: theme.palette.getContrastText(theme.custom.appBar.searchInputBackground),
         maxWidth: 249,
         fontSize: theme.typography.pxToRem(14),
         fontWeight: '400',
