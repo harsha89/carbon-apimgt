@@ -20,6 +20,7 @@ import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { withRouter } from 'react-router-dom';
 import isEmpty from 'lodash.isempty';
 import MarkdownEditor from './MarkdownEditor';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const TextEditor = lazy(() => import('./TextEditor'));
 
@@ -48,12 +49,10 @@ function EditContent(props) {
             )}
             {doc && doc.sourceType === 'INLINE' && (
                 <Suspense
-                    fallback={
-                        <FormattedMessage id='Apis.Details.Documents.EditContent.loading' defaultMessage='Loading...' />
-                    }
+                    fallback={<CircularProgress />}
                 >
                     <TextEditor docName={doc.name} docId={doc.documentId} showAtOnce />
-                </Suspense>
+                 </Suspense>
             )}
         </React.Fragment>
     );
