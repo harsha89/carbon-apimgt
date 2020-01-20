@@ -256,11 +256,11 @@ class Layout extends React.Component {
                     style, text, image, active,
                 },
                 appBar: {
-                    showSearch
+                    showSearch,
                 },
                 footer: {
                     active: footerActive, text: footerText,
-                }
+                },
             },
         } = theme;
         const { openNavBar } = this.state;
@@ -445,16 +445,20 @@ class Layout extends React.Component {
                             </Toolbar>
                         </AppBar>
                         <div className={classes.contentWrapper}>{this.props.children}</div>
-                        {footerActive &&<div className={classes.push} />}
+                        {footerActive && <div className={classes.push} />}
                     </div>
-                    {footerActive && <footer className={classes.footer} id='footer'>
+                    {footerActive &&
+                    <footer className={classes.footer} id='footer'>
                         <Typography noWrap>
-                            {footerText && footerText !== '' ? <span>{footerText}</span> :<FormattedMessage
-                                id='Base.index.copyright.text'
-                                defaultMessage='WSO2 API-M v3.0.0 | © 2019 WSO2 Inc'
-                            />}
+                            {footerText && footerText !== '' ? <span>{footerText}</span>
+                                : <FormattedMessage
+                                    id='Base.index.copyright.text'
+                                    defaultMessage='WSO2 API-M v3.0.0 | © 2019 WSO2 Inc'
+                                />
+                            }
                         </Typography>
-                    </footer>}
+                    </footer>
+                    }
                 </div>
             </React.Fragment>
         );
