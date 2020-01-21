@@ -51,8 +51,7 @@ const styles = theme => ({
     },
     input: {
         width: '280px',
-        background: theme.custom.appBar.searchInputBackground,
-        color: theme.palette.getContrastText(theme.custom.appBar.searchInputBackground),
+        background: theme.palette.getContrastText(theme.custom.appBar.background),
         '-webkit-transition': 'all .35s ease-in-out',
         transition: 'all .35s ease-in-out',
         padding: '5px 5px 5px 5px',
@@ -60,29 +59,28 @@ const styles = theme => ({
     },
     inputFocused: {
         width: '400px',
-        background: theme.custom.appBar.searchInputActiveBackground,
-        color: theme.palette.getContrastText(theme.custom.appBar.searchInputActiveBackground),
+        background: theme.palette.getContrastText(theme.custom.appBar.background),
         padding: '5px 5px 5px 5px',
     },
     searchBox: {
         padding: '5px 5px 5px 5px',
     },
     selectRoot: {
-        background: theme.custom.appBar.searchInputBackground,
+        background: '#fff',
         borderRight: '1px solid rgba(0, 0, 0, 0.42)',
         minHeight: '40px',
         padding: '5px 5px 5px 15px',
     },
     infoButton: {
         margin: theme.spacing(1),
-        color: theme.palette.getContrastText(theme.custom.appBar.background),
+        color: 'white',
     },
     emptyContainer: {
         flexGrow: 1,
     },
     InfoToolTip: {
-        backgroundColor: theme.custom.appBar.searchInputBackground,
-        color: theme.palette.getContrastText(theme.custom.appBar.searchInputBackground),
+        backgroundColor: '#f5f5f9',
+        color: 'rgba(0,0,0,0.87)',
         maxWidth: 249,
         fontSize: theme.typography.pxToRem(14),
         fontWeight: '400',

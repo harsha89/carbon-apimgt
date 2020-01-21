@@ -42,8 +42,6 @@ const Configurations = {
                     logoHeight: 19,
                     logoWidth: 208,
                     background: '#1d344f',
-                    searchInputBackground: '#fff',
-                    searchInputActiveBackground: '#fff',
                     activeBackground: '#254061',
                     showSearch: true,
                     drawerWidth: 200,
@@ -229,7 +227,7 @@ const Configurations = {
                     showTryout: true,
                     showDocuments: true,
                     showSdks: true,
-                    onlyShowSdks: [], // You can put an array of strings to enable only a given set of sdks. Leave empty to show all. ex: ['java','javascript']
+                    onlyShowSdks: [], // You can put an array of strings to enable only a given set of sdks. Leave empty to show all. ex: ['java','javascript'] 
                 },
                 banner: {
                     active: false, // make it true to display a banner image
