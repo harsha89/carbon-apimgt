@@ -41,7 +41,7 @@ public class TenantInfoApiServiceImpl extends TenantInfoApiService {
             }
             String decodedUserName = new String(Base64.getDecoder().decode(username));
             if (!APIUtil.isUserExist(decodedUserName)) {
-                RestApiUtil.handleBadRequest("Requested User " + decodedUserName + "does not exist", log);
+                RestApiUtil.handleBadRequest("Requested User " + decodedUserName + " does not exist", log);
             }
             String tenantDomain = MultitenantUtils.getTenantDomain(decodedUserName);
             int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
