@@ -35,11 +35,17 @@ public class TenantInfoApiServiceImpl extends TenantInfoApiService {
     @Override
     public Response getTenantInfoByUsername(String username){
         TenantInfoDTO tenantInfoDTO = new TenantInfoDTO();
+        String decodedUserName;
         try {
             if (StringUtils.isEmpty(username)) {
                 RestApiUtil.handleBadRequest("User Name should not be empty", log);
             }
-            String decodedUserName = new String(Base64.getDecoder().decode(username));
+            try {
+                 decodedUserName = new String(Base64.getDecoder().decode(username));
+            } catch (IllegalArgumentException e) {
+                log.warn("Could not decode the username. Using original username");
+                decodedUserName = username;
+            }
             if (!APIUtil.isUserExist(decodedUserName)) {
                 RestApiUtil.handleBadRequest("Requested User " + decodedUserName + " does not exist", log);
             }
