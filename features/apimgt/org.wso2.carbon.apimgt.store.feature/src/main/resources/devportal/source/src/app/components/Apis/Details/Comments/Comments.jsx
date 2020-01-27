@@ -221,7 +221,7 @@ class Comments extends Component {
         let loggedInUserDomain = null;
         const loggedInUser = currentUser.name;
         const settingsContext = this.context;
-        const { settings, tenantDomain } = settingsContext.settings;
+        const { settings, tenantDomain } = settingsContext;
         const { enableEmailUsername } = settings;
 
         if (apiProvider.includes('@')) {
