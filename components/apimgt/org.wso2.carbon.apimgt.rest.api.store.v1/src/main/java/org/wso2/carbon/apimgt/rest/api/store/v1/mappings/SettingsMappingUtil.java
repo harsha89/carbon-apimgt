@@ -29,6 +29,7 @@ import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.SettingsDTO;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,6 +48,8 @@ public class SettingsMappingUtil {
             settingsDTO.setScopes(GetScopeList());
             settingsDTO.setApplicationSharingEnabled(APIUtil.isMultiGroupAppSharingEnabled());
             settingsDTO.setMapExistingAuthApps(APIUtil.isMapExistingAuthAppsEnabled());
+            settingsDTO.setEnableEmailUsername(Boolean.parseBoolean(CarbonUtils.getServerConfiguration()
+                    .getFirstProperty("EnableEmailUserName")));
             Map<String, Environment> environments = APIUtil.getEnvironments();
             if (environments.isEmpty()) {
                 settingsDTO.apiGatewayEndpoint("http://localhost:8280,https://localhost:8243");
