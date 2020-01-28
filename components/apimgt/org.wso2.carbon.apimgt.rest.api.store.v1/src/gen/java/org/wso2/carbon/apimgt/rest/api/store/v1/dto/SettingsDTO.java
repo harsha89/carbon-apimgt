@@ -22,7 +22,6 @@ public class SettingsDTO   {
     private Boolean applicationSharingEnabled = false;
     private Boolean mapExistingAuthApps = false;
     private String apiGatewayEndpoint = null;
-    private Boolean enableEmailUsername = false;
 
   /**
    **/
@@ -109,23 +108,6 @@ public class SettingsDTO   {
     this.apiGatewayEndpoint = apiGatewayEndpoint;
   }
 
-  /**
-   **/
-  public SettingsDTO enableEmailUsername(Boolean enableEmailUsername) {
-    this.enableEmailUsername = enableEmailUsername;
-    return this;
-  }
-
-  
-  @ApiModelProperty(value = "")
-  @JsonProperty("enableEmailUsername")
-  public Boolean isEnableEmailUsername() {
-    return enableEmailUsername;
-  }
-  public void setEnableEmailUsername(Boolean enableEmailUsername) {
-    this.enableEmailUsername = enableEmailUsername;
-  }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -140,13 +122,12 @@ public class SettingsDTO   {
         Objects.equals(scopes, settings.scopes) &&
         Objects.equals(applicationSharingEnabled, settings.applicationSharingEnabled) &&
         Objects.equals(mapExistingAuthApps, settings.mapExistingAuthApps) &&
-        Objects.equals(apiGatewayEndpoint, settings.apiGatewayEndpoint) &&
-        Objects.equals(enableEmailUsername, settings.enableEmailUsername);
+        Objects.equals(apiGatewayEndpoint, settings.apiGatewayEndpoint);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, enableEmailUsername);
+    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint);
   }
 
   @Override
@@ -159,7 +140,6 @@ public class SettingsDTO   {
     sb.append("    applicationSharingEnabled: ").append(toIndentedString(applicationSharingEnabled)).append("\n");
     sb.append("    mapExistingAuthApps: ").append(toIndentedString(mapExistingAuthApps)).append("\n");
     sb.append("    apiGatewayEndpoint: ").append(toIndentedString(apiGatewayEndpoint)).append("\n");
-    sb.append("    enableEmailUsername: ").append(toIndentedString(enableEmailUsername)).append("\n");
     sb.append("}");
     return sb.toString();
   }
