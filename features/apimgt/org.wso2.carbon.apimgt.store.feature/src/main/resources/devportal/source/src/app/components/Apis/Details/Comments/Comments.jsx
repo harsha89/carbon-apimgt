@@ -245,7 +245,7 @@ class Comments extends Component {
                 if (splitLoggedInUser.length >= 3) {
                     loggedInUserDomain = splitLoggedInUser[splitLoggedInUser.length - 1];
                 } else {
-                    loggedInUserDomain = tenantDomain;
+                    loggedInUserDomain = tenantDomain ? tenantDomain : 'carbon.super';
                 }
             } else {
                 loggedInUserDomain = splitLoggedInUser[splitLoggedInUser.length - 1];
