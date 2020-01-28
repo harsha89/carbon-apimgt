@@ -5065,6 +5065,9 @@ definitions:
         default: false
       apiGatewayEndpoint:
         type: string
+      enableEmailUsername:
+        type: boolean
+        default: false
 #-----------------------------------------------------
 # The Application Attribute resource
 #-----------------------------------------------------
