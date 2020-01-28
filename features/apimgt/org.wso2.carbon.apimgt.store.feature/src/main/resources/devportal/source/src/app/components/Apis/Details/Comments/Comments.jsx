@@ -26,6 +26,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import CONSTS from 'AppData/Constants';
 import classNames from 'classnames';
 import InlineMessage from 'AppComponents/Shared/InlineMessage';
+import Settings from 'AppComponents/Shared/SettingsContext';
 import Comment from './Comment';
 import CommentAdd from './CommentAdd';
 import API from '../../../../data/api';
@@ -77,7 +78,7 @@ const styles = theme => ({
  * @extends {React.Component}
  */
 class Comments extends Component {
-    static contextType = ApiContext;
+    static contextType = Settings;
 
     /**
      * Creates an instance of Comments
@@ -216,29 +217,44 @@ class Comments extends Component {
      * @returns {boolean} true or false
      */
     isCrossTenant(apiProvider, currentUser) {
-        let tenantDomain = null;
+        let providerTenantDomain = null;
         let loggedInUserDomain = null;
         const loggedInUser = currentUser.name;
+        const settingsContext = this.context;
+        const { settings, tenantDomain } = settingsContext;
+        const { enableEmailUsername } = settings;
 
         if (apiProvider.includes('@')) {
             const splitDomain = apiProvider.split('@');
-            tenantDomain = splitDomain[splitDomain.length - 1];
+            if (enableEmailUsername) {
+                if (splitDomain.length >= 3) {
+                    providerTenantDomain = splitDomain[splitDomain.length - 1];
+                } else {
+                    providerTenantDomain = 'carbon.super';
+                }
+            } else {
+                providerTenantDomain = splitDomain[splitDomain.length - 1];
+            }
         } else {
-            tenantDomain = 'carbon.super';
+            providerTenantDomain = 'carbon.super';
         }
 
         if (loggedInUser.includes('@')) {
             const splitLoggedInUser = loggedInUser.split('@');
-            loggedInUserDomain = splitLoggedInUser[splitLoggedInUser.length - 1];
+            if (enableEmailUsername) {
+                if (splitLoggedInUser.length >= 3) {
+                    loggedInUserDomain = splitLoggedInUser[splitLoggedInUser.length - 1];
+                } else {
+                    loggedInUserDomain = tenantDomain ? tenantDomain : 'carbon.super';
+                }
+            } else {
+                loggedInUserDomain = splitLoggedInUser[splitLoggedInUser.length - 1];
+            }
         } else {
             loggedInUserDomain = 'carbon.super';
         }
 
-        if (tenantDomain !== loggedInUserDomain) {
-            return true;
-        } else {
-            return false;
-        }
+        return providerTenantDomain !== loggedInUserDomain;
     }
 
     /**
