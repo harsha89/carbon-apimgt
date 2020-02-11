@@ -50,10 +50,6 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 
 import javax.cache.Cache;
-<<<<<<< HEAD
-import javax.cache.Caching;
-=======
->>>>>>> f1d00284497... JWT validator and API Key validator improvments
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

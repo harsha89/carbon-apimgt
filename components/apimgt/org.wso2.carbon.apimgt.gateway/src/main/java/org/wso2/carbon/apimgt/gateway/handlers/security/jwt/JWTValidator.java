@@ -28,11 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.MethodStats;
-<<<<<<< HEAD
-=======
-import org.wso2.carbon.apimgt.gateway.dto.JWTInfoDto;
 import org.wso2.carbon.apimgt.gateway.dto.JWTTokenPayloadInfo;
->>>>>>> f1d00284497... JWT validator and API Key validator improvments
 import org.wso2.carbon.apimgt.gateway.handlers.WebsocketUtil;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APIKeyValidator;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityConstants;
@@ -50,10 +46,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 
 import javax.cache.Cache;
-<<<<<<< HEAD
 import javax.cache.Caching;
-=======
->>>>>>> f1d00284497... JWT validator and API Key validator improvments
 import java.util.Base64;
 import java.util.HashMap;
 
