@@ -370,16 +370,11 @@ public class CacheProvider {
                 createRESTAPITokenCache().getName());
         Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).removeCache(CacheProvider.
                 createRESTAPIInvalidTokenCache().getName());
-<<<<<<< HEAD
-=======
-        Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).removeCache(CacheProvider.
-                getGatewayJWTTokenCache().getName());
         Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).removeCache(CacheProvider.
                 getGatewayApiKeyCache().getName());
         Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).removeCache(CacheProvider.
                 getGatewayApiKeyDataCache().getName());
         Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).removeCache(CacheProvider.
                 getInvalidGatewayApiKeyCache().getName());
->>>>>>> f1d00284497... JWT validator and API Key validator improvments
     }
 }
